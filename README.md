@@ -75,5 +75,8 @@ This is _not_ code signed. Feel free to code sign at your own discretion for you
 This is _not_ notarized. Feel free to notarize at your own discretion for your use case.
 *WARNING* Please inspect the source before notarizing to ensure this is the right action for you.
 
+## Archived Version
+An unsupported archived repository of the older versions of this utility is available here: https://github.com/carlashley/appleloops_archive.
+
 ## License
 This is licensed using the Apache License, Version 2.0.
