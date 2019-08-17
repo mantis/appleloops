@@ -338,6 +338,9 @@ class ProcessedSource(object):
         self.all_download_size = self._all_download_size()
         self.all_install_size = self._all_install_size()
 
+        self.total_size_req = self.all_download_size + self.all_install_size
+        self.total_size_req_hr = misc.bytes2hr(byte=self.total_size_req)
+
         self.all_download_size_hr = self._all_download_size_hr()
         self.all_install_size_hr = self._all_install_size_hr()
 

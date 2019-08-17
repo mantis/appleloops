@@ -148,4 +148,8 @@ class LoopDeployment(object):
 
         if config.DEPLOY_PKGS or config.FORCED_DEPLOYMENT:
             self._install(pkg=pkg)
-            misc.clean_up(file_path=pkg)
+
+            if not config.DRY_RUN:
+                # Don't try and delete from DMG.
+                if not config.HTTP_DMG:
+                    misc.clean_up(file_path=pkg.DownloadPath)

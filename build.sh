@@ -4,6 +4,8 @@
 if [ -f /usr/local/bin/python3 ]; then
     /usr/local/bin/python3 -m zipapp src --compress --output dist/zipapp/usr/local/bin/appleloops --python='/usr/bin/env python'
     /usr/local/bin/python3 -m zipapp src --compress --output appleloops --python='/usr/bin/env python'
+    /bin/chmod +x dist/zipapp/usr/local/bin/appleloops
+    /bin/chmod +x appleloops
     /usr/bin/make
 else
     echo "Python 3 is required to use zipapp. Exiting."

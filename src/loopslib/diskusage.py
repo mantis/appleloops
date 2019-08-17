@@ -59,11 +59,11 @@ class DiskStats(object):
 
         return result
 
-    @property
-    def has_space(self):
+    def has_space(self, space_used):
         """Returns True/False if the download and install size is less than
         the available free space on disk."""
         result = None
+        self.space_used = space_used
 
         result = self._get_has_space()
 

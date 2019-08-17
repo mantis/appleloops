@@ -250,12 +250,15 @@ class BuildDMG(object):
                 # Log success/fail with short message.
                 LOG.debug('{}: {}'.format(' '.join(cmd), process.returncode))
 
-    def mount(self, dmg):
+    def mount(self, dmg, read_only=False):
         """Mounts the specified 'dmg' file."""
         cmd = [self._hdiutil,
                'attach',
                '-plist',
                dmg]
+
+        if read_only and isinstance(read_only, bool):
+            cmd.insert(2, '-readonly')
 
         # Have to mount DMG if '--pkg-server' is a DMG
         if not config.DRY_RUN:

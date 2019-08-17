@@ -31,6 +31,7 @@ from loopslib import applications
 from loopslib import arguments
 from loopslib import compare
 from loopslib import config
+from loopslib import diskusage
 from loopslib import deployment
 from loopslib import dmg
 from loopslib import misc
@@ -69,6 +70,9 @@ def main():
     # Logging
     config_logging(log_level=args.log_level)
 
+    # Disk
+    disk = diskusage.DiskStats()
+
     # Open log file
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     logging.info('------------------ Log opened on {} ------------------'.format(now))
@@ -99,7 +103,7 @@ def main():
     # Mount a HTTP DMG if exists (deployment only)
     if config.HTTP_DMG:
         sparse = dmg.BuildDMG()
-        sparse.mount(dmg=config.HTTP_DMG_PATH)
+        sparse.mount(dmg=config.HTTP_DMG_PATH, read_only=True)  # Force read only so no delete!
 
     if config.APPS_TO_PROCESS:
         garageband = applications.Application('garageband') if 'garageband' in config.APPS_TO_PROCESS else None
@@ -123,6 +127,17 @@ def main():
 
     # Process packages
     if packages.all:
+        if config.DEPLOY_PKGS or config.FORCED_DEPLOYMENT:
+            if not disk.has_space(packages.total_size_req):
+                _msg = ('Insufficient space to install packages. Free up more space to continue. '
+                        'Download and install size is {}.'.format(packages.total_size_req_hr))
+                _dbg = ('Insufficient space. {} download total and {} install total.'.format(packages.all_download_size_hr,
+                                                                                             packages.all_install_size_hr))
+                logging.info(_msg)
+                logging.debug(_dbg)
+                print(_msg)
+                sys.exit(1)
+
         package = deployment.LoopDeployment()
 
         # for pkg in packages.all[:2]:
