@@ -4,6 +4,7 @@ import logging
 
 from os import path
 
+# pylint: disable=relative-import
 try:
     import misc
     import supported
@@ -12,6 +13,7 @@ except ImportError:
     from . import misc
     from . import supported
     from . import version
+# pylint: enable=relative-import
 
 LOG = logging.getLogger(__name__)
 

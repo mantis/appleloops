@@ -1,9 +1,11 @@
 """Contains the dictionaries to use for constructing arguments."""
 
+# pylint: disable=relative-import
 try:
     import version
 except ImportError:
     from . import version
+# pylint: enable=relative-import
 
 
 # Arguments that can be combined together.

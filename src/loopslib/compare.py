@@ -4,6 +4,7 @@ import os
 import sys
 import tempfile
 
+# pylint: disable=relative-import
 try:
     import config
     import curl_requests
@@ -14,10 +15,14 @@ except ImportError:
     from . import curl_requests
     from . import misc
     from . import plist
+# pylint: enable=relative-import
 
 LOG = logging.getLogger(__name__)
 
 
+# pylint: disable=too-many-locals
+# pylint: disable=too-many-branches
+# pylint: disable=too-many-statements
 def differences(file_a, file_b, detailed_info=False):
     """Compares the package details in 'file_a' against 'file_b' to determine
     what files exist in 'file_b' but not in 'file_a'. This will also display
@@ -109,3 +114,6 @@ def differences(file_a, file_b, detailed_info=False):
 
     # Exit success because nothing else to do.
     sys.exit(0)
+# pylint: enable=too-many-statements
+# pylint: enable=too-many-branches
+# pylint: enable=too-many-locals

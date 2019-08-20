@@ -1,9 +1,9 @@
 """Deployement."""
 import logging
 import os
-import shutil
 import subprocess  # NOQA
 
+# pylint: disable=relative-import
 try:
     import config
     import curl_requests
@@ -14,6 +14,7 @@ except ImportError:
     from . import curl_requests
     from . import misc
     from . import package
+# pylint: enable=relative-import
 
 LOG = logging.getLogger(__name__)
 
@@ -42,6 +43,7 @@ class LoopDeployment(object):
         if isinstance(size, int):
             self._install_size += size
 
+    # pylint: disable=no-self-use
     # pylint: disable=inconsistent-return-statements
     def _download(self, pkg):
         """Downloads a package from the specified URL."""
@@ -98,7 +100,6 @@ class LoopDeployment(object):
 
         return result
 
-    # pylint: disable=no-self-use
     def _install(self, pkg):
         """Installs a package."""
         result = None
@@ -131,17 +132,6 @@ class LoopDeployment(object):
 
         return result
     # pylint: enable=no-self-use
-
-    def tidy_up(self):
-        """Tidy's up working directories."""
-        if not config.DRY_RUN:
-            # Don't need to tidy up if building a DMG because sparseimage.
-            if not config.DMG_FILE and not config.DMG_VOLUME_MOUNTPATH:
-                try:
-                    shutil.rmtree(config.DESTINATION_PATH)
-                except OSError as e:
-                    LOG.debug('Error removing: {} - {}'.format(config.DESTINATION_PATH, e))
-                    raise
 
     def process(self, pkg):
         """Processes the download/install of packages."""

@@ -6,6 +6,7 @@ import re
 from distutils.version import LooseVersion
 from glob import glob
 
+# pylint: disable=relative-import
 try:
     import bad_wolf
     import config
@@ -18,6 +19,7 @@ except ImportError:
     from . import option_packs
     from . import package
     from . import plist
+# pylint: enable=relative-import
 
 LOG = logging.getLogger(__name__)
 
@@ -63,7 +65,7 @@ class Application(object):
         if self._file_path:
             result = os.path.exists(self._file_path)
 
-        if not result and (config.DEPLOY_PKGS or config.FORCED_DEPLOY):
+        if not result and (config.DEPLOY_PKGS or config.FORCED_DEPLOYMENT):
             _app_name = os.path.basename(self._file_path).replace('.app', '')
             LOG.info('{} is not installed. Skipping.'.format(_app_name))
 
@@ -134,9 +136,11 @@ class Application(object):
 
                     _pkg_obj = package.LoopPackage(**_new_pkg)
 
+                    # pylint: disable=no-member
                     # Only add/process packages that are _not_ 'BadWolfIgnore = True'
                     if not _pkg_obj.BadWolfIgnore:
                         result.add(_pkg_obj)
+                    # pylint: enable=no-member
 
                 # Now process option packs
                 self.option_packs = option_packs.OptionPack(source=_root, release=_basename).option_packs

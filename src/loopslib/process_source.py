@@ -4,6 +4,7 @@ import sys
 
 from datetime import datetime
 
+# pylint: disable=relative-import
 try:
     import applications
     import config
@@ -14,6 +15,7 @@ except ImportError:
     from . import config
     from . import misc
     from . import remote_plist
+# pylint: enable=relative-import
 
 LOG = logging.getLogger(__name__)
 
@@ -98,8 +100,8 @@ class ProcessedSource(object):
 
             now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             # Quick redefine 'LOG' to use 'root' namespace for neatness in log.
-            LOG = logging.getLogger()
-            LOG.info('------------------ Log closed on {} ------------------'.format(now))
+            _log = logging.getLogger()
+            _log.info('------------------ Log closed on {} ------------------'.format(now))
             sys.exit(0)
         else:
             self.all = sorted(self.all, key=lambda pkg: pkg.DownloadName)

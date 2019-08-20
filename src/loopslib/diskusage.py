@@ -5,19 +5,23 @@ import sys
 
 from os import path
 
+# pylint: disable=relative-import
 try:
     import plist
 except ImportError:
     from . import plist
+# pylint: enable=relative-import
 
 LOG = logging.getLogger(__name__)
 
 
 class DiskStats(object):
     """Class for attributes about disk usage."""
-    def __init__(self, disk=None, space_used=None):
+    # def __init__(self, disk=None, space_used=None):
+    def __init__(self, disk=None):
         self._disk = disk if disk and path.exists(disk) else '/'
-        self._space_used = space_used if space_used else 0
+
+        self.space_used = None
 
     def _get_disk_stats(self):
         """Gets the amount of free space and returns a byte value."""

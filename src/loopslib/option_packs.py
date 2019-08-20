@@ -1,4 +1,6 @@
 """Used to determine which optional packages belong to which 'pack' per release."""
+# pylint: disable=too-many-locals
+from pprint import pprint
 
 
 class OptionPack(object):
@@ -28,8 +30,13 @@ class OptionPack(object):
         if any(self._release.startswith(x) for x in ['logicpro', 'mainstage']):
             self._content = self._content.get('en')
 
+    # pylint: disable=too-many-nested-blocks
+    # pylint: disable=too-many-branches
     def _process_packs(self):
         """Processes the option packs."""
+        # NOTE: Things get a little 'complicated' because Logic Pro X and MainStage
+        # have 'subcontent' packs that make up _some_ of their bigger content packs.
+        # So these are treated as 'packs' in their own right.
         result = list()
 
         if self._content:
@@ -63,7 +70,7 @@ class OptionPack(object):
                                         _sp_desc = _v.strip()
                                         break
 
-                        if len(_packages) != 0:
+                        if _packages:
                             _pack['Name'] = _sp_name
                             _pack['Description'] = _sp_desc
                             _pack['Packages'] = _packages
@@ -86,7 +93,7 @@ class OptionPack(object):
                                     _description = _v.strip()
                                     break
 
-                    if len(_pkgs) != 0:
+                    if _pkgs:
                         _pack['Description'] = _description
                         _pack['Name'] = _name
                         _pack['Packages'] = _pkgs
@@ -97,6 +104,8 @@ class OptionPack(object):
                         result.append(_rp)
 
         return result
+    # pylint: enable=too-many-branches
+    # pylint: enable=too-many-nested-blocks
 
 
 class Pack(object):
@@ -112,6 +121,8 @@ class Pack(object):
             else:
                 setattr(self, kwarg, value)
 
+    # pylint: disable=no-else-return
+    # pylint: disable=no-member
     def __hash__(self):
         """Hash a tuple (immutable) containing the pack 'Name' attribute."""
         if isinstance(self, Pack):
@@ -133,3 +144,6 @@ class Pack(object):
             return not self.Name == other.Name
         else:
             return NotImplemented
+    # pylint: enable=no-member
+    # pylint: enable=no-else-return
+# pylint: enable=too-many-locals

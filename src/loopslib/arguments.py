@@ -12,16 +12,24 @@ except ImportError:
 
 from operator import attrgetter
 
+# pylint: disable=relative-import
 try:
     import arguments_config
+    import compare
     import config
     import misc
+    import supported
 except ImportError:
     from . import arguments_config
+    from . import compare
     from . import config
     from . import misc
+    from . import supported
+# pylint: enable=relative-import
 
 LOG = logging.getLogger(__name__)
+
+# pylint: disable=too-many-locals
 
 
 class SaneUsageFormat(argparse.HelpFormatter):
@@ -108,6 +116,8 @@ class LoopsArguments(object):
 
             self._plist_args.add_argument(*args, **kwargs)
 
+    # pylint: disable=too-many-branches
+    # pylint: disable=too-many-statements
     def parse_args(self):
         """Parses arguments."""
         result = None
@@ -134,8 +144,8 @@ class LoopsArguments(object):
         # Check that at least on of the three apps is provided for download flag '-a/--apps'
         if result.apps:
             _arg = '-a/--apps'
-            _choices = ', '.join(["'{}'".format(_app) for _app in config.APPS.keys()])
-            _apps = [_app for _app in config.APPS.keys()]
+            _choices = ', '.join(["'{}'".format(_app) for _app, _value in config.APPS.items()])
+            _apps = [_app for _app, _value in config.APPS.items()]
 
             if not any([app in result.apps for app in _apps]):
                 self.parser.print_usage(sys.stderr)
@@ -234,6 +244,12 @@ class LoopsArguments(object):
                 LOG.info(_msg)
                 sys.exit(1)
 
+        if result.show_plists:
+            supported.show_supported_plists()
+
+        if result.compare:
+            compare.differences(file_a=result.compare[0], file_b=result.compare[1])
+
         # Set "globals" here rather than in '__main__.py'
         if not result.plists:
             config.APPS_TO_PROCESS = result.apps if result.apps else misc.find_installed_apps()
@@ -275,3 +291,6 @@ class LoopsArguments(object):
                 config.DMG_VOLUME_MOUNTPATH = '/Volumes/appleloops'
 
         return result
+    # pylint: enable=too-many-statements
+    # pylint: enable=too-many-branches
+# pylint: enable=too-many-locals

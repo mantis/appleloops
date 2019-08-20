@@ -6,10 +6,12 @@ import xml
 
 from distutils.version import LooseVersion
 
+# pylint: disable=relative-import
 try:
     import version
 except ImportError:
     from . import version
+# pylint: enable=relative-import
 
 LOG = logging.getLogger(__name__)
 

@@ -11,6 +11,7 @@ try:
 except ImportError:
     from urllib.parse import urlparse  # Python 3 package
 
+# pylint: disable=relative-import
 try:
     import config
     import curl_requests
@@ -21,6 +22,7 @@ except ImportError:
     from . import curl_requests
     from . import misc
     from . import plist
+# pylint: enable=relative-import
 
 LOG = logging.getLogger(__name__)
 
@@ -73,8 +75,7 @@ class LoopPackage(object):
 
         # Fix the Apple 'PackageVersion' attribute to a 'LooseVersion' type.
         if hasattr(self, 'PackageVersion'):
-            # if self.PackageVersion:
-            if isinstance(self.PackageVersion, int) or isinstance(self.PackageVersion, float):
+            if isinstance(self.PackageVersion, (float, int)):
                 self.PackageVersion = u'{}'.format(self.PackageVersion)
 
             self.PackageVersion = LooseVersion(self.PackageVersion)
@@ -296,6 +297,7 @@ class InstalledPackageInfo(object):
 
         if process.returncode is 0:
             _result = plist.readPlistFromString(p_result)
+            LOG.debug(p_result)
 
             if _result:
                 result = dict()
@@ -309,6 +311,7 @@ class InstalledPackageInfo(object):
             else:
                 result = False
         else:
+            LOG.debug(p_error)
             result = False
 
         LOG.debug('{}: {}'.format(' '.join(cmd), result))

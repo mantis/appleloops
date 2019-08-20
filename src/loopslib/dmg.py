@@ -5,19 +5,23 @@ import sys
 
 from os import path, remove
 
+# pylint: disable=relative-import
 try:
     import config
     import plist
 except ImportError:
     from . import config
     from . import plist
+# pylint: enable=relative-import
 
 LOG = logging.getLogger(__name__)
+
+# pylint: disable=too-many-nested-blocks
 
 
 class BuildDMG(object):
     """Class for handling DMG files."""
-    def __init__(self, filename=None, filesystem=None):
+    def __init__(self, filename=None):
         self._hdiutil = '/usr/bin/hdiutil'
         self._valid_fs = ['HFS+J' 'HFS+', 'APFS']
         self._volume_kind = {'HFS+': 'hfs',
@@ -28,8 +32,6 @@ class BuildDMG(object):
         self.sparse_image = '{}.sparseimage'.format(path.splitext(filename)[0]) if filename else None
         self.volume_name = config.DMG_VOLUME_NAME
 
-        # if filesystem and filesystem in self._valid_fs:
-        #     self.filesystem = filesystem
         if config.APFS_DMG:
             self.filesystem = 'APFS'
         else:
@@ -52,6 +54,7 @@ class BuildDMG(object):
 
                 if process.returncode == 0:
                     LOG.info('Unmounted {}'.format(sparseimage))
+                    LOG.debug(p_result)
                 else:
                     LOG.debug('{}: {} - {}'.format(' '.join(cmd), process.returncode, p_error))
 
@@ -63,6 +66,7 @@ class BuildDMG(object):
         else:
             raise Exception('Unexpected \'hdiutil\' action: {}'.format(action))
 
+    # pylint: disable=no-self-use
     def _get_devicepath(self, output):
         """Gets the '/dev/disk' device path from the output of the 'hdiutil' command."""
         # Use the PLIST output to set 'config.DMG_VOLUME_MOUNTPATH'
@@ -86,6 +90,7 @@ class BuildDMG(object):
                 break
 
         return result
+    # pylint: enable=no-self-use
 
     def _sparse_exists(self):
         """Gets information about any potential attached sparse images to avoid
@@ -156,7 +161,7 @@ class BuildDMG(object):
     def convert_sparseimage(self, sparseimage):
         """Converts the temporary DMG into the final DMG file."""
         # Unmount sparseimage first.
-        self.eject(sparseimage=config.DMG_VOLUME_MOUNTPATH)
+        self.eject(dmg=config.DMG_VOLUME_MOUNTPATH)
 
         cmd = [self._hdiutil,
                'convert',
@@ -179,6 +184,7 @@ class BuildDMG(object):
 
             if process.returncode == 0:
                 LOG.info('Created {}'.format(self.filename))
+                LOG.debug(p_result)
 
                 if not (config.QUIET or config.SILENT):
                     print('Created {}'.format(self.filename))
@@ -284,3 +290,4 @@ class BuildDMG(object):
 
         if config.DRY_RUN and config.HTTP_DMG:
             config.DMG_VOLUME_MOUNTPATH = config.DRY_RUN_VOLUME_MOUNTPATH
+# pylint: enable=too-many-nested-blocks

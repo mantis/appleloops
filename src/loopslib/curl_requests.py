@@ -3,12 +3,14 @@ import logging
 import re
 import subprocess
 
+# pylint: disable=relative-import
 try:
     import config
     import curl_errors
 except ImportError:
     from . import config
     from . import curl_errors
+# pylint: enable=relative-import
 
 LOG = logging.getLogger(__name__)
 
@@ -162,9 +164,9 @@ class CURL(object):
                     print('Downloading {}'.format(url))
 
                 subprocess.check_call(cmd)
-            except subprocess.CalledProcessError as e:
-                LOG.debug('{}: {}'.format(' '.join(cmd), e))
-                raise e
+            except subprocess.CalledProcessError as _e:
+                LOG.debug('{}: {}'.format(' '.join(cmd), _e))
+                raise _e
         elif config.DRY_RUN:
             if not config.SILENT:
                 _msg = 'Download {}'.format(url)

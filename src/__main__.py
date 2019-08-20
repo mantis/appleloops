@@ -29,14 +29,12 @@ from pprint import pprint  # NOQA
 # import loopslib  # NOQA
 from loopslib import applications
 from loopslib import arguments
-from loopslib import compare
 from loopslib import config
 from loopslib import diskusage
 from loopslib import deployment
 from loopslib import dmg
 from loopslib import misc
 from loopslib import process_source
-from loopslib import supported
 
 
 # pylint: disable=invalid-name
@@ -59,7 +57,8 @@ def config_logging(log_level=None):
 
 
 # pylint: disable=missing-docstring
-# pylint: disable=unused-variable
+# pylint: disable=too-many-branches
+# pylint: disable=too-many-statements
 def main():
     # Set global value of '__name__'
     config.NAME = __name__
@@ -85,13 +84,6 @@ def main():
 
     # Debug log stats
     misc.debug_log_stats()
-
-    # Do things that aren't setting 'config' values.
-    if args.compare:
-        compare.differences(file_a=args.compare[0], file_b=args.compare[1])
-
-    if args.show_plists:
-        supported.show_supported_plists()
 
     # Continue on if there are apps/plists to process.
     apps_as_source = None
@@ -147,7 +139,7 @@ def main():
 
         # Tidy up any temp items, only if this is not a download!
         if args.deployment or args.force_deployment:
-            package.tidy_up()
+            misc.tidy_up()
 
     # Unmount HTTP DMG
     if config.HTTP_DMG:
@@ -160,6 +152,8 @@ def main():
     # The last thing logged.
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     logging.info('------------------ Log closed on {} ------------------'.format(now))
+# pylint: enable=too-many-statements
+# pylint: enable=too-many-branches
 # pylint: enable=missing-docstring
 
 
