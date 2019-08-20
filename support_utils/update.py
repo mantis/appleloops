@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+"""Simple utility to assist with updating versions and
+mirrored property lists."""
+from __future__ import print_function
+
+# pylint: disable=line-too-long
+# pylint: disable=too-many-nested-blocks
+
 import os
 import re
 import subprocess
@@ -8,15 +15,15 @@ from glob import glob
 from sys import argv
 
 
-base_dir = os.getcwd().replace('support_utils', '')
-lp10_dir = os.path.join(base_dir, 'lp10_ms3_content_2016')
-lib_dir = os.path.join(base_dir, 'src', 'loopslib')
-supported_file = os.path.join(lib_dir, 'supported.py')
-version_file = os.path.join(lib_dir, 'version.py')
-curl_path = ['/usr/bin/curl']
-apple_url = 'https://audiocontentdownload.apple.com/lp10_ms3_content_2016'
+BASE_DIR = os.getcwd().replace('support_utils', '')
+LP10_DIR = os.path.join(BASE_DIR, 'lp10_ms3_content_2016')
+LIB_DIR = os.path.join(BASE_DIR, 'src', 'loopslib')
+SUPPORTED_FILE = os.path.join(LIB_DIR, 'supported.py')
+VERSION_FILE = os.path.join(LIB_DIR, 'version.py')
+CURL_PATH = ['/usr/bin/curl']
+APPLE_URL = 'https://audiocontentdownload.apple.com/lp10_ms3_content_2016'
 
-apps = {'garageband': range(1010, 1099),
+APPS = {'garageband': range(1010, 1099),
         'logicpro': range(1020, 1099),
         'mainstage': range(320, 399)}
 
@@ -32,7 +39,7 @@ def get_headers(url):
                          '307 Temporary Redirect',
                          '308 Permanent Redirect']
 
-    cmd = curl_path + ['-I', '-L', url]
+    cmd = CURL_PATH + ['-I', '-L', url]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     p_result, p_error = process.communicate()
 
@@ -50,20 +57,20 @@ def get_headers(url):
             # Now tidy up
             p_result = p_result.strip().splitlines()
 
-            for line in p_result:
-                if re.match(r'^HTTP/\d{1}.\d{1} ', line) and ':' not in line:
-                    result['Status'] = line
+            for _line in p_result:
+                if re.match(r'^HTTP/\d{1}.\d{1} ', _line) and ':' not in _line:
+                    result['Status'] = _line
 
                     # Set the status code as a seperate value so we can minimise curl usage.
                 else:
-                    if ':' in line:
-                        key = line.split(': ')[0]
-                        value = ''.join(line.split(': ')[1:])
+                    if ':' in _line:
+                        _key = _line.split(': ')[0]
+                        value = ''.join(_line.split(': ')[1:])
 
-                        if 'content-length' in key.lower():
+                        if 'content-length' in _key.lower():
                             value = int(value)
 
-                        result[key] = value
+                        result[_key] = value
     else:
         print('Error:\n{}'.format(p_error))
 
@@ -92,7 +99,7 @@ def get_status(headers):
 
 def get(url, output):
     """Retrieves the specified URL. Saves it to path specified in 'output' if present."""
-    cmd = curl_path + ['-L', '-C', '-', url, '--progress-bar', '--create-dirs', '-o', output]
+    cmd = CURL_PATH + ['-L', '-C', '-', url, '--progress-bar', '--create-dirs', '-o', output]
 
     try:
         subprocess.check_call(cmd)
@@ -116,91 +123,93 @@ def convert_plist(plist_path):
 
     if process.returncode is 0:
         result = p_result
+    else:
+        print(p_error)
 
     return result
 
 
-new_files = set()
+NEW_FILES = set()
 
-for app, version in apps.items():
+for app, version in APPS.items():
     for ver in version:
         filename = '{}{}.plist'.format(app, ver)
-        output = os.path.join(lp10_dir, filename)
-        url = '{}/{}'.format(apple_url, filename)
+        _output = os.path.join(LP10_DIR, filename)
+        _url = '{}/{}'.format(APPLE_URL, filename)
 
-        headers = get_headers(url)
+        _headers = get_headers(_url)
 
-        if get_status(headers) == 200:
-            if os.path.exists(output):
+        if get_status(_headers) == 200:
+            if os.path.exists(_output):
                 print('Skipping {}'.format(filename))
             else:
                 print('Fetching {}'.format(filename))
-                get(url, output)
-                new_files.add(output)
+                get(_url, _output)
+                NEW_FILES.add(_output)
 
-new_files = list(new_files)
+NEW_FILES = list(NEW_FILES)
 
-if new_files:
-    for nf in new_files:
+if NEW_FILES:
+    for nf in NEW_FILES:
         print('Converting {} to non binary plist'.format(nf))
         convert_plist(nf)
 
 
 SUPPORTED = dict()
 
-docstring = '"""Contains a basic dictionary for the supported releases of\nApple\'s audio applications, and relevant \'feed\' files."""\n'
-import_line = 'import logging\n\nLOG = logging.getLogger(__name__)\n\n\n'
-support_method = ('def show_supported_plists():\n'
+DOCSTRING = '"""Contains a basic dictionary for the supported releases of\nApple\'s audio applications, and relevant \'feed\' files."""\n'
+IMPORT_LINE = 'import logging\n\nLOG = logging.getLogger(__name__)\n\n\n'
+SUPPORT_METHOD = ('def show_supported_plists():\n'
                   '    """Prints out the supported plists for help."""\n'
                   '    print(\'Supported plist files are:\')\n\n'
                   '    for _plist in sorted(SUPPORTED.values()):\n'
                   '        print(\'  {}\'.format(_plist))\n\n'
-                  '    exit(0)')
+                  '    exit(0)\n')
 
-plists = glob('{}/*.plist'.format(lp10_dir))
+PLISTS = glob('{}/*.plist'.format(LP10_DIR))
 
-for plist in plists:
+for plist in PLISTS:
     basename = os.path.basename(plist)
-    key = basename.replace('.plist', '')
+    _key = basename.replace('.plist', '')
 
-    SUPPORTED[key] = basename
+    SUPPORTED[_key] = basename
 
-with open(supported_file, 'w') as _f:
-    _f.write(docstring)
-    _f.write(import_line)
+with open(SUPPORTED_FILE, 'w') as _f:
+    _f.write(DOCSTRING)
+    _f.write(IMPORT_LINE)
     _f.write('SUPPORTED = {\n')
 
-    for key in sorted(SUPPORTED.keys()):
-        _f.write("    '{}': '{}',\n".format(key, SUPPORTED[key]))
+    for _key, _value in sorted(SUPPORTED.items()):
+        _f.write("    '{}': '{}',\n".format(_key, SUPPORTED[_key]))
 
     _f.write('}\n\n')
     _f.write('LOG.debug(\'Supported: {}\'.format(SUPPORTED))\n\n\n')
-    _f.write(support_method)
+    _f.write(SUPPORT_METHOD)
 
 
-if 'update_ver' in argv or len(new_files) > 0:
-    with open(version_file, 'r') as _f:
-        doc = _f.readlines()
+if 'update_ver' in argv or NEW_FILES:
+    with open(VERSION_FILE, 'r') as _f:
+        DOC = _f.readlines()
 
-    for line in doc:
-        if line.startswith('VERSION = '):
-            index = doc.index(line)
+    for _line in DOC:
+        if _line.startswith('VERSION = '):
+            index = DOC.index(_line)
             break
 
-    ver = doc[index].strip().split('VERSION = ')[-1].strip('\'')
-    ver = ''.join(ver.split('.'))
-    ver = int(ver)
+    VER = DOC[index].strip().split('VERSION = ')[-1].strip('\'')
+    VER = ''.join(VER.split('.'))
+    VER = int(VER)
 
-    if ver < 1000:
-        ver += 1
-        ver = str(ver)
-        ver = '.'.join([n for n in ver])
-        print('Incremented version to {}'.format(ver))
-        ver = "VERSION = '{}'\n".format(ver)
+    if VER < 1000:
+        VER += 1
+        VER = str(VER)
+        VER = '.'.join([n for n in VER])
+        print('Incremented version to {}'.format(VER))
+        VER = "VERSION = '{}'\n".format(VER)
 
-        now = datetime.now().strftime('%Y-%m-%d')
-        doc[index] = ver
-        doc[index + 1] = 'VER_DATE = \'{}\'\n'.format(now)
+        NOW = datetime.now().strftime('%Y-%m-%d')
+        DOC[index] = VER
+        DOC[index + 1] = 'VER_DATE = \'{}\'\n'.format(NOW)
 
-    with open(version_file, 'w') as _f:
-        _f.write(''.join(doc))
+    with open(VERSION_FILE, 'w') as _f:
+        _f.write(''.join(DOC))
