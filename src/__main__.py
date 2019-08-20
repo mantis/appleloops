@@ -121,7 +121,7 @@ def main():
     # Process packages
     if packages.all:
         if config.DEPLOY_PKGS or config.FORCED_DEPLOYMENT:
-            if not disk.has_space(packages.total_size_req):
+            if not disk.has_space(space_requested=packages.total_size_req):
                 _msg = ('Insufficient space to install packages. Free up more space to continue. '
                         'Download and install size is {}.'.format(packages.total_size_req_hr))
                 _dbg = ('Insufficient space. {} download total and {} install total.'.format(packages.all_download_size_hr,
@@ -133,9 +133,12 @@ def main():
 
         package = deployment.LoopDeployment()
 
-        # for pkg in packages.all[:2]:
+        # Do the stuff.
+        _l = len(packages.all)
         for pkg in packages.all:
-            package.process(pkg)
+            _i = packages.all.index(pkg) + 1
+            _ctr_msg = '{}/{}'.format(_i, _l)
+            package.process(pkg, counter_msg=_ctr_msg)
 
         # Tidy up any temp items, only if this is not a download!
         if args.deployment or args.force_deployment:
