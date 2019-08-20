@@ -31,6 +31,7 @@ class DiskStats(object):
             result = plist.readPlistFromString(p_result)
         else:
             print(p_error)
+            LOG.info(p_error)
             sys.exit(process.returncode)
 
         return result

@@ -33,7 +33,7 @@ def differences(file_a, file_b, detailed_info=False):
     file_b = sorted_files[1]
     base_b = os.path.basename(file_b)
 
-    _supported = config.SUPPORTED_PLISTS.values()
+    _supported = [_v for _v in config.SUPPORTED_PLISTS.values()]
     _supported.sort()
 
     if not all(_file.endswith('.plist') for _file in [file_a, file_b]):

@@ -35,6 +35,7 @@ from loopslib import diskusage
 from loopslib import deployment
 from loopslib import dmg
 from loopslib import misc
+from loopslib import process_source
 from loopslib import supported
 
 
@@ -97,7 +98,7 @@ def main():
     plists_as_source = None
 
     # Some output indicating work is underway
-    if not config.SILENT:
+    if not (config.QUIET or config.SILENT):
         print('Analysing...')
 
     # Mount a HTTP DMG if exists (deployment only)
@@ -116,10 +117,10 @@ def main():
 
     # Processed apps go into single instance of 'ProcessedApplications'.
     if apps_as_source:
-        packages = applications.ProcessedSource(apps=apps_as_source)
+        packages = process_source.ProcessedSource(apps=apps_as_source)
         logging.debug('Processed Applications: {}'.format(packages.__dict__))
     elif plists_as_source:
-        packages = applications.ProcessedSource(plists=plists_as_source)
+        packages = process_source.ProcessedSource(plists=plists_as_source)
         logging.debug('Processed Property Lists: {}'.format(packages.__dict__))
 
     if not config.SILENT:

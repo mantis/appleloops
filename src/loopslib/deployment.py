@@ -115,7 +115,8 @@ class LoopDeployment(object):
             LOG.info(_msg)
         else:
             if os.path.exists(filename):
-                print('Installing {}'.format(pkg.DownloadName))
+                if not config.SILENT:
+                    print('Installing {}'.format(pkg.DownloadName))
 
                 install_result = self._installer(cmd=cmd)
                 msg = '{}'.format(install_result[1]).replace('_PKG_', pkg.DownloadName)
@@ -124,8 +125,9 @@ class LoopDeployment(object):
                 if not config.SILENT:
                     print(msg)
             else:
-                print('File not found: {}'.format(filename))
                 LOG.info('File not found: {}'.format(filename))
+                if not config.SILENT:
+                    print('File not found: {}'.format(filename))
 
         return result
     # pylint: enable=no-self-use

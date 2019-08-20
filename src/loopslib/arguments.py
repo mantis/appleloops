@@ -5,6 +5,11 @@ import os
 import re
 import sys
 
+try:
+    from urlparse import urlparse  # Python 2 package
+except ImportError:
+    from urllib.parse import urlparse  # Python 3 package
+
 from operator import attrgetter
 
 try:
@@ -72,6 +77,8 @@ class LoopsArguments(object):
         self._verbose_args = self.parser.add_mutually_exclusive_group()
         self._deploy_args = self.parser.add_mutually_exclusive_group()
         self._plist_args = self.parser.add_mutually_exclusive_group()
+
+        self._valid_url_schemes = ['http', 'https']
 
         self._construct_args()
 
@@ -207,8 +214,9 @@ class LoopsArguments(object):
         if result.cache_server:
             _arg = '--cache-server'
             _cs = result.cache_server[0]
+            _url = urlparse(_cs)
 
-            if not (re.match(r'^(http|https)://\w+.\w+.\w+:\d+$', _cs) or re.match(r'^(http|https)://\w+.\w+:\d+$', _cs)):
+            if _url.scheme not in self._valid_url_schemes or not re.search(r'(?::\d+)', _url.netloc):  # and _url.path is not None:
                 _msg = '{} {}: cache server url format expected is https://example.org:1234'.format(_err_msg, _arg)
                 print(_msg)
                 LOG.info(_msg)
@@ -217,9 +225,10 @@ class LoopsArguments(object):
         if result.pkg_server:
             _arg = '--pkg-server'
             _ps = result.pkg_server[0]
+            _url = urlparse(_ps)
 
-            if not (re.match(r'^(http|https)://\w+.\w+.\w+/appleloops+$', _ps) or re.match(r'^(http|https)://\w+.\w+\w+.\w+/\w+.dmg', _ps)):
-                _msg = ('{} {}: mirror server url format expected is https://example.org/appleloops '
+            if _url.scheme not in self._valid_url_schemes or not _url.path:
+                _msg = ('{} {}: mirror server url format expected is https://example.org/<path> '
                         'or https://example.org/file.dmg'.format(_err_msg, _arg))
                 print(_msg)
                 LOG.info(_msg)
@@ -235,16 +244,17 @@ class LoopsArguments(object):
         config.ALLOW_INSECURE_CURL = result.insecure
         config.ALLOW_UNSECURE_PKGS = result.unsecure
         config.APFS_DMG = result.apfs_dmg
-        config.CACHING_SERVER = result.cache_server[0] if result.cache_server else None
+        config.CACHING_SERVER = result.cache_server[0].rstrip('/') if result.cache_server else None
         config.DEBUG = getattr(logging, result.log_level, None)
         config.DESTINATION_PATH = result.download[0] if result.download else config.DEFAULT_DEST
         config.DEPLOY_PKGS = result.deployment
         config.FORCED_DEPLOYMENT = result.force_deployment
         config.DMG_FILE = result.build_dmg[0] if result.build_dmg else None
         config.DRY_RUN = result.dry_run
-        config.LOCAL_HTTP_SERVER = result.pkg_server[0] if result.pkg_server else None
+        config.LOCAL_HTTP_SERVER = result.pkg_server[0].rstrip('/') if result.pkg_server else None
         config.MANDATORY = result.mandatory
         config.OPTIONAL = result.optional
+        config.QUIET = result.quiet
         config.SILENT = result.silent
         config.TARGET = result.install_target[0] if result.install_target else '/'
 

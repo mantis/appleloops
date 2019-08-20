@@ -99,7 +99,8 @@ class CURL(object):
         else:
             LOG.debug('{}: {}'.format(' '.join(cmd), p_error))
             # May need to not print the error out in certain circumstances
-            print('Error:\n{}'.format(p_error))
+            if not config.SILENT:
+                print('Error:\n{}'.format(p_error))
         # pylint: enable=too-many-nested-blocks
 
         return result
@@ -157,7 +158,7 @@ class CURL(object):
             try:
                 LOG.info('Downloading {}'.format(url))
 
-                if not (config.QUIET or config.SILENT or self._silent_override or _fetching_plist):
+                if not (config.SILENT or self._silent_override or _fetching_plist):
                     print('Downloading {}'.format(url))
 
                 subprocess.check_call(cmd)

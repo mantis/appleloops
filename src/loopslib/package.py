@@ -1,8 +1,6 @@
 """Contains the class for creating package objects."""
 import logging
-import re
 import subprocess
-import sys
 
 from datetime import datetime
 from distutils.version import LooseVersion
@@ -123,14 +121,6 @@ class LoopPackage(object):
                                                                      config.LOCAL_HTTP_SERVER)
 
             if config.CACHING_SERVER:
-                if not re.match(r'^(http|https)://\w+.\w+:\d+', config.CACHING_SERVER):
-                    msg = ('Caching Server URL expected is \'https://example.org:1234\' or '
-                           '\'http://example.org:1234\' - not \'{}\''.format(config.CACHING_SERVER))
-                    LOG.info(msg)
-                    print(msg)
-
-                    sys.exit(1)
-
                 parsed_url = urlparse(self.DownloadURL)
                 self.CacheDownloadURL = '{}{}?source={}'.format(config.CACHING_SERVER,
                                                                 parsed_url.path,
@@ -176,7 +166,7 @@ class LoopPackage(object):
 
     def __ne__(self, other):
         """Used for testing 'not' equality of a package instance based on the package
-        'DownloadName' attribute. Implemented for Python 2.7 compatability."""
+        'DownloadName' attribute. Implemented for Python 2.7 compatibility."""
         if isinstance(self, LoopPackage):
             return not self.DownloadName == other.DownloadName
         else:
@@ -287,7 +277,7 @@ class InstalledPackageInfo(object):
 
     def __ne__(self, other):
         """Used for testing 'not' equality  'pkginfo' attribute.
-        Implemented for Python 2.7 compatability."""
+        Implemented for Python 2.7 compatibility."""
         if isinstance(self, InstalledPackageInfo):
             return not self.pkgid == other.pkgid
         else:

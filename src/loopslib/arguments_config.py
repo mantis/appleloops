@@ -86,6 +86,11 @@ CL_EXCL_GRP_ARGS_01 = {
                           'dest': 'silent',
                           'help': 'no output to stdout',
                           'required': False}},
+    'quiet': {'args': ['-q', '--quiet'],
+              'kwargs': {'action': 'store_true',
+                         'dest': 'quiet',
+                         'help': 'minimal output to stdout',
+                         'required': False}}
 }
 
 CL_EXCL_GRP_ARGS_02 = {

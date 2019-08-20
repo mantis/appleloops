@@ -66,7 +66,8 @@ def find_installed_apps():
                ' please use the \'-a/--app\' or \'-p/--plist\' flag'.format(config.NAME))
 
         LOG.debug(msg)
-        print(msg)
+        if not config.SILENT:
+            print(msg)
 
         sys.exit(1)
 
