@@ -102,6 +102,7 @@ def clean_up(file_path):
     """Removes a file."""
     try:
         os.remove(file_path)
+        LOG.debug('Removed: {}'.format(file_path))
     except OSError as _e:
         # Sometimes might need a few seconds to finish IO
         sleep(2)
@@ -119,6 +120,7 @@ def tidy_up():
         if not config.DMG_FILE and not config.DMG_VOLUME_MOUNTPATH:
             try:
                 shutil.rmtree(config.DESTINATION_PATH)
+                LOG.debug('Removed: {}'.format(config.DESTINATION_PATH))
             except OSError as _e:
                 LOG.debug('Error removing: {} - {}'.format(config.DESTINATION_PATH, _e))
                 raise

@@ -45,7 +45,7 @@ class LoopDeployment(object):
 
     # pylint: disable=no-self-use
     # pylint: disable=inconsistent-return-statements
-    def _download(self, pkg):
+    def _download(self, pkg, counter_msg):
         """Downloads a package from the specified URL."""
         if isinstance(pkg, package.LoopPackage):
             _url = pkg.DownloadURL
@@ -62,19 +62,19 @@ class LoopDeployment(object):
 
             if req.status:
                 if req.status in config.HTTP_OK_STATUS:
-                    curl.get(url=_url, output=pkg.DownloadPath)
+                    curl.get(url=_url, output=pkg.DownloadPath, counter_msg=counter_msg)
                 elif req.status not in config.HTTP_OK_STATUS:
                     # Fallback only if the url is either a cache or pkg server
                     if _url in [pkg.LocalDownloadURL, pkg.CacheDownloadURL]:
                         LOG.debug('Fell back {} to {}'.format(_url, pkg.DownloadURL))
                         _url = pkg.DownloadURL
-                        curl.get(url=_url, output=pkg.DownloadPath)
+                        curl.get(url=_url, output=pkg.DownloadPath, counter_msg=counter_msg)
             elif not req.status or req.curl_error:
                 # Fallback only if the url is either a cache or pkg server
                 if _url in [pkg.LocalDownloadURL, pkg.CacheDownloadURL]:
                     LOG.debug('Fell back {} to {}'.format(_url, pkg.DownloadURL))
                     _url = pkg.DownloadURL
-                    curl.get(url=_url, output=pkg.DownloadPath)
+                    curl.get(url=_url, output=pkg.DownloadPath, counter_msg=counter_msg)
         else:
             LOG.debug('{} is {}'.format(pkg, pkg.__class__))
             return NotImplemented
@@ -100,7 +100,7 @@ class LoopDeployment(object):
 
         return result
 
-    def _install(self, pkg):
+    def _install(self, pkg, counter_msg):
         """Installs a package."""
         result = None
         filename = os.path.join(config.DESTINATION_PATH, pkg.DownloadPath)
@@ -117,7 +117,7 @@ class LoopDeployment(object):
         else:
             if os.path.exists(filename):
                 if not config.SILENT:
-                    print('Installing {}'.format(pkg.DownloadName))
+                    print('Installing {} - {}'.format(counter_msg, pkg.DownloadName))
 
                 install_result = self._installer(cmd=cmd)
                 msg = '{}'.format(install_result[1]).replace('_PKG_', pkg.DownloadName)
@@ -133,13 +133,13 @@ class LoopDeployment(object):
         return result
     # pylint: enable=no-self-use
 
-    def process(self, pkg):
+    def process(self, pkg, counter_msg):
         """Processes the download/install of packages."""
         if not config.HTTP_DMG:
-            self._download(pkg=pkg)
+            self._download(pkg=pkg, counter_msg=counter_msg)
 
         if config.DEPLOY_PKGS or config.FORCED_DEPLOYMENT:
-            self._install(pkg=pkg)
+            self._install(pkg=pkg, counter_msg=counter_msg)
 
             if not config.DRY_RUN:
                 # Don't try and delete from DMG.

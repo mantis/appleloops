@@ -40,16 +40,16 @@ class DiskStats(object):
 
         return result
 
-    def _get_has_space(self):
+    def _get_has_space(self, space_used):
         """Returns a True/False if there is enough free space."""
         result = None
 
         _freespace = self._get_disk_stats()['FreeSpace']
         LOG.debug('Freespace (disk {}): {}'.format(self._disk, _freespace))
 
-        if all([isinstance(value, int) for value in [self._space_used, _freespace]]):
-            result = self._space_used < _freespace
-            LOG.debug('Space used: {}, Freespace: {}, Has enough space: {}'.format(self._space_used,
+        if all([isinstance(value, int) for value in [space_used, _freespace]]):
+            result = space_used < _freespace
+            LOG.debug('Space used: {}, Freespace: {}, Has enough space: {}'.format(space_used,
                                                                                    _freespace,
                                                                                    result))
 
@@ -64,12 +64,11 @@ class DiskStats(object):
 
         return result
 
-    def has_space(self, space_used):
+    def has_space(self, space_requested):
         """Returns True/False if the download and install size is less than
         the available free space on disk."""
         result = None
-        self.space_used = space_used
 
-        result = self._get_has_space()
+        result = self._get_has_space(space_used=space_requested)
 
         return result

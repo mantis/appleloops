@@ -1,15 +1,18 @@
 """Contains the class for using CURL."""
 import logging
 import re
+import os
 import subprocess
 
 # pylint: disable=relative-import
 try:
     import config
     import curl_errors
+    import misc
 except ImportError:
     from . import config
     from . import curl_errors
+    from . import misc
 # pylint: enable=relative-import
 
 LOG = logging.getLogger(__name__)
@@ -126,7 +129,7 @@ class CURL(object):
 
         return result
 
-    def get(self, url, output=None):
+    def get(self, url, output=None, counter_msg=None):
         """Retrieves the specified URL. Saves it to path specified in 'output' if present."""
         # NOTE: Must ignore 'dry run' state for any '.plist' file downloads.
         _fetching_plist = url.endswith('.plist')
@@ -139,6 +142,11 @@ class CURL(object):
                '-C',
                '-',
                url]
+
+        if config.FORCE_DOWNLOAD and os.path.exists(output):
+            if not config.DRY_RUN:
+                LOG.debug('Forced download - removing: {}'.format(output))
+                misc.clean_up(file_path=output)
 
         if config.PROXY:
             cmd.extend(['--proxy', config.PROXY])
@@ -157,11 +165,19 @@ class CURL(object):
         LOG.debug('CURL get: {}'.format(' '.join(cmd)))
 
         if not config.DRY_RUN or _fetching_plist:
+            if counter_msg:
+                _msg = 'Downloading {} - {}'.format(counter_msg, url)
+            else:
+                _msg = 'Downloading {}'.format(url)
+
+            if config.FORCE_DOWNLOAD:
+                _msg = _msg.replace('Downloading', 'Re-downloading')
+
             try:
-                LOG.info('Downloading {}'.format(url))
+                LOG.info(_msg)
 
                 if not (config.SILENT or self._silent_override or _fetching_plist):
-                    print('Downloading {}'.format(url))
+                    print(_msg)
 
                 subprocess.check_call(cmd)
             except subprocess.CalledProcessError as _e:
@@ -169,7 +185,7 @@ class CURL(object):
                 raise _e
         elif config.DRY_RUN:
             if not config.SILENT:
-                _msg = 'Download {}'.format(url)
+                _msg = 'Download {} - {}'.format(counter_msg, url)
 
                 print(_msg)
                 LOG.info(_msg)

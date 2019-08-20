@@ -62,6 +62,7 @@ FORCED_DEPLOYMENT = False
 # Destination path (a default value is provided)
 DEFAULT_DEST = '/tmp/appleloops'
 DESTINATION_PATH = None
+FORCE_DOWNLOAD = False
 
 # DMG File stuff
 APFS_DMG = False

@@ -185,9 +185,10 @@ class LoopsArguments(object):
                 LOG.info(_msg)
                 sys.exit(1)
 
-            if not (result.build_dmg or result.download):
+            if not (result.build_dmg or result.download or result.force_download):
                 self.parser.print_usage(sys.stderr)
-                _msg = '{}: {}: not allowed without argument -b/--build-dmg or -d/--download'.format(_err_msg, _arg)
+                _msg = ('{}: {}: not allowed without argument -b/--build-dmg or -d/--destination '
+                        'or -f/--force-destination'.format(_err_msg, _arg))
                 print(_msg)
                 LOG.info(_msg)
                 sys.exit(1)
@@ -206,8 +207,12 @@ class LoopsArguments(object):
                 sys.exit(1)
 
         # Handle some checking for more specific circumstances.
-        if (result.download or result.deployment or result.force_deployment):
-            _arg = '-d/--download'
+        if (result.download or result.force_download or result.deployment or result.force_deployment):
+            if result.download:
+                _arg = '-d/--destination'
+
+            if result.force_download:
+                _arg = '-f/--force-destination'
 
             if result.deployment:
                 _arg = '--deploy'
@@ -262,7 +267,6 @@ class LoopsArguments(object):
         config.APFS_DMG = result.apfs_dmg
         config.CACHING_SERVER = result.cache_server[0].rstrip('/') if result.cache_server else None
         config.DEBUG = getattr(logging, result.log_level, None)
-        config.DESTINATION_PATH = result.download[0] if result.download else config.DEFAULT_DEST
         config.DEPLOY_PKGS = result.deployment
         config.FORCED_DEPLOYMENT = result.force_deployment
         config.DMG_FILE = result.build_dmg[0] if result.build_dmg else None
@@ -273,6 +277,19 @@ class LoopsArguments(object):
         config.QUIET = result.quiet
         config.SILENT = result.silent
         config.TARGET = result.install_target[0] if result.install_target else '/'
+
+        # Handle result.download/result.force_download
+        if result.download or result.force_download:
+            if result.download:
+                config.DESTINATION_PATH = result.download[0]
+            elif result.force_download:
+                config.FORCE_DOWNLOAD = True
+                config.DESTINATION_PATH = result.force_download[0]
+            else:
+                config.DESTINATION_PATH = config.DEFAULT_DEST
+
+        if config.DEPLOY_PKGS or config.FORCED_DEPLOYMENT:
+            config.DESTINATION_PATH = config.DEFAULT_DEST
 
         # Handle HTTP based DMG
         if config.LOCAL_HTTP_SERVER:
