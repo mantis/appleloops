@@ -80,7 +80,8 @@ class RemotePlist(object):
                 # pylint: enable=no-member
 
             # Now process option packs
-            self.option_packs = option_packs.OptionPack(source=_root, release=_basename).option_packs
+            _opt_packs = option_packs.OptionPack(source=_root, release=_basename)
+            self.option_packs = _opt_packs.option_packs
 
         misc.clean_up(file_path=_tmp_file)
 

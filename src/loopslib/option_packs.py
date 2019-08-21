@@ -1,13 +1,12 @@
 """Used to determine which optional packages belong to which 'pack' per release."""
 # pylint: disable=too-many-locals
-from pprint import pprint
 
 
 class OptionPack(object):
     """Attributes for the 'collection packs' of packages in an Application."""
     def __init__(self, source, release):
         self._source = source
-        self._release = release
+        self._release = release.replace('.plist', '')
 
         self._content = self._source.get('Content', None)
         self._packages = self._source.get('Packages', None)
@@ -21,14 +20,14 @@ class OptionPack(object):
             if not self._packages[_pkg].get('IsMandatory', False):
                 self._optional_packages.add(_pkg)
 
-        # Public attr.
-        self.option_packs = self._process_packs()
-
         # In Logic Pro X & MainStage source files, the 'Content' key is a dict.
         # In the 'Content' dict, there's typically 'localised' versions, so pull
         # the 'en' one.
         if any(self._release.startswith(x) for x in ['logicpro', 'mainstage']):
             self._content = self._content.get('en')
+
+        # Public attr.
+        self.option_packs = self._process_packs()
 
     # pylint: disable=too-many-nested-blocks
     # pylint: disable=too-many-branches

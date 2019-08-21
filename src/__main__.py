@@ -137,6 +137,7 @@ def main():
         _l = len(packages.all)
         for pkg in packages.all:
             _i = packages.all.index(pkg) + 1
+            _i = '{i:0{width}d}'.format(width=len(str(_l)), i=_i)
             _ctr_msg = '{}/{}'.format(_i, _l)
             package.process(pkg, counter_msg=_ctr_msg)
 

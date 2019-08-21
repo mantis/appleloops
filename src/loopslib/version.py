@@ -8,7 +8,7 @@ from sys import version_info
 LOG = logging.getLogger(__name__)
 
 AUTHOR = 'Carl Windus'
-VERSION = '3.0.4'
+VERSION = '3.0.5'
 VER_DATE = '2019-08-21'
 LICENSE = 'Apache License, Version 2.0'
 COPYRIGHT = 'Copyright 2019, {}'.format(AUTHOR)
