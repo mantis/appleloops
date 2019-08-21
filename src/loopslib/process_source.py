@@ -44,9 +44,9 @@ class ProcessedSource(object):
                 self._plists = list()
 
                 for _plist in plists:
-                    plist = remote_plist.RemotePlist(plist=_plist)
+                    _pl = remote_plist.RemotePlist(obj=_plist)
 
-                    self._plists.append(plist)
+                    self._plists.append(_pl)
             else:
                 self._plists = None
 

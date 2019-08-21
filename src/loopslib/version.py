@@ -8,8 +8,8 @@ from sys import version_info
 LOG = logging.getLogger(__name__)
 
 AUTHOR = 'Carl Windus'
-VERSION = '3.0.3'
-VER_DATE = '2019-08-20'
+VERSION = '3.0.4'
+VER_DATE = '2019-08-21'
 LICENSE = 'Apache License, Version 2.0'
 COPYRIGHT = 'Copyright 2019, {}'.format(AUTHOR)
 VERSION_STR = 'appleloops {} ({})'.format(VERSION, LICENSE)
