@@ -138,7 +138,7 @@ def main():
         for pkg in packages.all:
             _i = packages.all.index(pkg) + 1
             _i = '{i:0{width}d}'.format(width=len(str(_l)), i=_i)
-            _ctr_msg = '{}/{}'.format(_i, _l)
+            _ctr_msg = '{} of {}'.format(_i, _l)
             package.process(pkg, counter_msg=_ctr_msg)
 
         # Tidy up any temp items, only if this is not a download!

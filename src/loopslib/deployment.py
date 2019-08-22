@@ -112,7 +112,7 @@ class LoopDeployment(object):
 
         if config.DRY_RUN:
             _msg = ' '.join(cmd)
-            print(_msg)
+            print('  {}'.format(_msg))
             LOG.info(_msg)
         else:
             if os.path.exists(filename):

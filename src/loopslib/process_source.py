@@ -36,6 +36,14 @@ class ProcessedSource(object):
                               if _app is not None and
                               isinstance(_app, applications.Application) and
                               _app.is_installed]
+                _apps_info = ['{} ({})'.format(_a.app_name, _a.version) for _a in self._apps]
+                _apps_info = ', '.join(_apps_info).strip(' ')
+                _apps_discovered_msg = 'Installed apps found: {}'.format(_apps_info)
+
+                if not config.SILENT:
+                    print(_apps_discovered_msg)
+
+                LOG.info(_apps_discovered_msg)
             else:
                 self._apps = None
 
