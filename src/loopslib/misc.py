@@ -100,17 +100,20 @@ def plist_url_path(plist):
 
 def clean_up(file_path):
     """Removes a file."""
-    try:
-        os.remove(file_path)
-        LOG.debug('Removed: {}'.format(file_path))
-    except OSError as _e:
-        # Sometimes might need a few seconds to finish IO
-        sleep(2)
+    if os.path.exists(file_path):
         try:
             os.remove(file_path)
-        except Exception as _e:
-            LOG.debug('Error removing: {} - {}'.format(file_path, _e))
-            raise
+            LOG.debug('Removed: {}'.format(file_path))
+        except OSError as _e:
+            # Sometimes might need a few seconds to finish IO
+            sleep(2)
+            try:
+                os.remove(file_path)
+            except Exception as _e:
+                LOG.debug('Error removing: {} - {}'.format(file_path, _e))
+                pass  # Keep calm and carry on.
+    else:
+        pass
 
 
 def tidy_up():
@@ -118,12 +121,15 @@ def tidy_up():
     if not config.DRY_RUN:
         # Don't need to tidy up if building a DMG because sparseimage.
         if not config.DMG_FILE and not config.DMG_VOLUME_MOUNTPATH:
-            try:
-                shutil.rmtree(config.DESTINATION_PATH)
-                LOG.debug('Removed: {}'.format(config.DESTINATION_PATH))
-            except OSError as _e:
-                LOG.debug('Error removing: {} - {}'.format(config.DESTINATION_PATH, _e))
-                raise
+            if os.path.exists(config.DESTINATION_PATH):
+                try:
+                    shutil.rmtree(config.DESTINATION_PATH)
+                    LOG.debug('Removed: {}'.format(config.DESTINATION_PATH))
+                except OSError as _e:
+                    LOG.debug('Error removing: {} - {}'.format(config.DESTINATION_PATH, _e))
+                    raise
+            else:
+                pass
 
 
 def debug_log_stats():
