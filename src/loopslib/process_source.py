@@ -40,7 +40,7 @@ class ProcessedSource(object):
                 _apps_info = ', '.join(_apps_info).strip(' ')
                 _apps_discovered_msg = 'Installed apps found: {}'.format(_apps_info)
 
-                if not config.SILENT:
+                if not config.SILENT and _apps_info:
                     print(_apps_discovered_msg)
 
                 LOG.info(_apps_discovered_msg)

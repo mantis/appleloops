@@ -67,7 +67,12 @@ class Application(object):
 
         if not result and (config.DEPLOY_PKGS or config.FORCED_DEPLOYMENT):
             _app_name = os.path.basename(self._file_path).replace('.app', '')
-            LOG.info('{} is not installed. Skipping.'.format(_app_name))
+            _msg = '{} is not installed. Skipping.'.format(_app_name)
+
+            if not config.SILENT:
+                print(_msg)
+
+            LOG.info(_msg)
 
         return result
 
