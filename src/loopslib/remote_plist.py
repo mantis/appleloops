@@ -64,6 +64,10 @@ class RemotePlist(object):
             for _pkg in _root['Packages']:
                 _new_pkg = _root['Packages'][_pkg].copy()  # Work on copy
 
+                # Create a new key called 'PackageName' that
+                # contains the value '_pkg' for use with content packs.
+                _new_pkg['PackageName'] = _pkg
+
                 if _bad_wolf_fixes:
                     _bwd = _bad_wolf_fixes.get(_pkg, None)  # A dictionary from '_bad_wolf_fixes'
 

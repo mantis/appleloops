@@ -110,10 +110,8 @@ def main():
     # Processed apps go into single instance of 'ProcessedApplications'.
     if apps_as_source:
         packages = process_source.ProcessedSource(apps=apps_as_source)
-        logging.debug('Processed Applications: {}'.format(packages.__dict__))
     elif plists_as_source:
         packages = process_source.ProcessedSource(plists=plists_as_source)
-        logging.debug('Processed Property Lists: {}'.format(packages.__dict__))
 
     if not config.SILENT:
         print('{}\n'.format(packages.stats_message))

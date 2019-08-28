@@ -44,6 +44,7 @@ class LoopPackage(object):
                     'MissingDownloadOnly': False,
                     'NeverUpdateLegacy': False,
                     'PackageID': None,
+                    'PackageName': None,
                     'PackageVersion': '0.0.0',
                     'DownloadURL': None,
                     'LocalDownloadURL': None,
@@ -196,7 +197,11 @@ class LoopPackage(object):
 
             if hasattr(self, 'FileCheck'):
                 if isinstance(self.FileCheck, list):
-                    files_installed = all(path.exists(f) for f in self.FileCheck)
+                    # It seems that when there is a list of file paths to check,
+                    # it's because at various points the files were installed
+                    # to different locations, so if _any_ path exists, consider
+                    # the 'files_installed' to be 'True'.
+                    files_installed = any(path.exists(f) for f in self.FileCheck)
                 elif isinstance(self.FileCheck, str):
                     files_installed = path.exists(self.FileCheck)
 

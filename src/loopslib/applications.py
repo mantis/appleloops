@@ -56,8 +56,6 @@ class Application(object):
             self.minimum_os_req = LooseVersion(self._app_info.get('LSMinimumSystemVersion', None))
             self.version = LooseVersion(self._app_info.get('CFBundleShortVersionString', None))
 
-            LOG.debug('Object created: {}'.format(self.__dict__))
-
     def _is_app_installed(self):
         """Determines if the app is installed."""
         result = False  # Default to 'False'
@@ -131,6 +129,10 @@ class Application(object):
                 # Apply 'Bad Wolf' pathches
                 for _pkg in _root['Packages']:
                     _new_pkg = _root['Packages'][_pkg].copy()  # Work on copy
+
+                    # Create a new key called 'PackageName' that
+                    # contains the value '_pkg' for use with content packs.
+                    _new_pkg['PackageName'] = _pkg
 
                     if _bad_wolf_fixes:
                         _bwd = _bad_wolf_fixes.get(_pkg, None)  # A dictionary from '_bad_wolf_fixes'

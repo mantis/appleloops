@@ -7,8 +7,10 @@ from os import path
 
 # pylint: disable=relative-import
 try:
+    import misc
     import plist
 except ImportError:
+    from . import misc
     from . import plist
 # pylint: enable=relative-import
 
@@ -45,13 +47,16 @@ class DiskStats(object):
         result = None
 
         _freespace = self._get_disk_stats()['FreeSpace']
-        LOG.debug('Freespace (disk {}): {}'.format(self._disk, _freespace))
 
         if all([isinstance(value, int) for value in [space_used, _freespace]]):
             result = space_used < _freespace
-            LOG.debug('Space used: {}, Freespace: {}, Has enough space: {}'.format(space_used,
-                                                                                   _freespace,
-                                                                                   result))
+            _space_used_hr = misc.bytes2hr(byte=space_used)
+            _freespace_hr = misc.bytes2hr(byte=_freespace)
+
+            LOG.debug('Disk: {}'.format(self._disk))
+            LOG.debug('Space used: {} ({})'.format(space_used, _space_used_hr))
+            LOG.debug('Freespace: {} ({})'.format(_freespace, _freespace_hr))
+            LOG.debug('Has enough space: {}'.format(result))
 
         return result
 

@@ -114,6 +114,11 @@ class ProcessedSource(object):
         else:
             self.all = sorted(self.all, key=lambda pkg: pkg.DownloadName)
 
+            for _pkg in self.all:
+                _mand_or_opt = 'Mandatory' if _pkg.IsMandatory else 'Optional'
+
+                LOG.debug('Package to process: {} ({})'.format(_pkg.PackageName, _mand_or_opt))
+
         # Quantities of each
         self.all_qty = len(self.all)
         self.mandatory_qty = len(self.mandatory)
@@ -158,6 +163,8 @@ class ProcessedSource(object):
         self.all_download_msg = 'All packages download size: {} ({}) packages'.format(
             self.all_download_size_hr, self.all_qty
         )
+        LOG.debug(self.all_download_msg)
+
         self.all_install_msg = 'All packages installation size: {}'.format(
             self.all_install_size_hr
         )
@@ -165,14 +172,17 @@ class ProcessedSource(object):
         self.mandatory_dld_ins_msg = 'Mandatory packages download/install size: {}/{} ({} packages)'.format(
             self.mandatory_download_size_hr, self.mandatory_install_size_hr, self.mandatory_qty
         )
+        LOG.debug(self.mandatory_dld_ins_msg)
 
         self.optional_dld_ins_msg = 'Optional packages download/install size: {}/{} ({} packages)'.format(
             self.optional_download_size_hr, self.optional_install_size_hr, self.optional_qty
         )
+        LOG.debug(self.optional_dld_ins_msg)
 
         self.all_dld_ins_msg = 'All packages download/install size: {}/{} ({}) packages'.format(
             self.all_download_size_hr, self.all_install_size_hr, self.all_qty
         )
+        LOG.debug(self.all_dld_ins_msg)
 
         self.stats_message = '{}'.format(self.all_dld_ins_msg)
 

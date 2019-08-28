@@ -108,7 +108,7 @@ class LoopDeployment(object):
         cmd = ['/usr/sbin/installer', '-pkg', filename, '-target', config.TARGET]
 
         if config.ALLOW_UNSECURE_PKGS:
-            cmd.insert(1, '--allowUntrusted')  # Insert at index 1, shifts right
+            cmd.insert(1, '-allowUntrusted')  # Insert at index 1, shifts right
 
         if config.DRY_RUN:
             _msg = ' '.join(cmd)
