@@ -50,10 +50,12 @@ class RemotePlist(object):
 
         _req = curl_requests.CURL(url=self._plist_url_path)
 
+        # NOTE 2019-11-04: Seems that using the 'resume' capability in cURL does not
+        # work here now for some reason, so don't resume.
         if _req.status in config.HTTP_OK_STATUS:
-            _req.get(url=self._plist_url_path, output=_tmp_file)
+            _req.get(url=self._plist_url_path, output=_tmp_file, resume=False)
         else:
-            _req.get(url=self._plist_failover_url_path, output=_tmp_file)
+            _req.get(url=self._plist_failover_url_path, output=_tmp_file, resume=False)
 
         _root = plist.readPlist(_tmp_file)
 

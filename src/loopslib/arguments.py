@@ -142,10 +142,14 @@ class LoopsArguments(object):
                 sys.exit(1)
 
         # Check that at least on of the three apps is provided for download flag '-a/--apps'
-        if result.apps:
+        if result.apps == 'allpkgs' or 'allpkgs' in result.apps:
+            result.apps = config.ALL_LATEST_APPS
+        elif result.apps:
             _arg = '-a/--apps'
-            _choices = ', '.join(["'{}'".format(_app) for _app, _value in config.APPS.items()])
             _apps = [_app for _app, _value in config.APPS.items()]
+            _apps.extend(['allpkgs'])
+            _apps.sort()
+            _choices = ', '.join(["'{}'".format(_app) for _app in _apps])
 
             if not any([app in result.apps for app in _apps]):
                 self.parser.print_usage(sys.stderr)
@@ -162,8 +166,11 @@ class LoopsArguments(object):
             _choices = ["'{}'".format(_plist) for _plist in _supported]
             _choices.sort()
             _choices = ', '.join(_choices)
+            _choices = '\'allpkgs\', {}'.format(_choices)
 
-            if not any([_plist in _supported for _plist in result.plists]):
+            if result.plists == 'allpkgs' or 'allpkgs' in result.plists:
+                result.plists = [config.SUPPORTED_PLISTS.get(_plist) for _plist in config.ALL_LATEST_PLISTS]
+            elif not any([_plist in _supported for _plist in result.plists]):
                 _msg = '{} {}: excpected one argument: (choose from {})'.format(_err_msg, _arg, _choices)
                 print(_msg)
                 LOG.info(_msg)

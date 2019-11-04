@@ -152,3 +152,9 @@ LP_LATEST_PLIST = ['{}/{}/{}'.format(AUDIOCONTENT_URL, LP10_MS3_CONTENT, x)
 MS_LATEST_PLIST = ['{}/{}/{}'.format(AUDIOCONTENT_URL, LP10_MS3_CONTENT, x)
                    for x in sorted(supported.SUPPORTED.values(), reverse=True)
                    if x.startswith('mainstage')][0]
+
+ALL_LATEST_PLISTS = [path.basename(GB_LATEST_PLIST).replace('.plist', ''),
+                     path.basename(LP_LATEST_PLIST).replace('.plist', ''),
+                     path.basename(MS_LATEST_PLIST).replace('.plist', '')]
+
+ALL_LATEST_APPS = [_key for _key, _val in APPS.items()]

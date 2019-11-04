@@ -129,7 +129,7 @@ class CURL(object):
 
         return result
 
-    def get(self, url, output=None, counter_msg=None):
+    def get(self, url, output=None, counter_msg=None, resume=True):
         """Retrieves the specified URL. Saves it to path specified in 'output' if present."""
         # NOTE: Must ignore 'dry run' state for any '.plist' file downloads.
         _fetching_plist = url.endswith('.plist')
@@ -137,11 +137,12 @@ class CURL(object):
         # Now the command.
         cmd = [self._curl_path,
                '--user-agent',
-               config.USERAGENT,
-               '-L',
-               '-C',
-               '-',
-               url]
+               config.USERAGENT]
+
+        if resume:
+            cmd.extend(['-L', '-C', '-'])
+
+        cmd.extend([url])
 
         if config.FORCE_DOWNLOAD and os.path.exists(output):
             if not config.DRY_RUN:
