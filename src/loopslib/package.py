@@ -64,7 +64,7 @@ class LoopPackage(object):
     def __init__(self, **kwargs):
         # Set attributes based on 'VALID_KWARGS'
         for kwarg, value in self.VALID_KWARGS.items():
-            if kwarg in kwargs.keys():
+            if kwarg in [_key for _key, _value in kwargs.items()]:
                 setattr(self, kwarg, kwargs.get(kwarg, None))
             else:
                 setattr(self, kwarg, value)
@@ -300,7 +300,7 @@ class InstalledPackageInfo(object):
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         p_result, p_error = process.communicate()
 
-        if process.returncode is 0:
+        if process.returncode == 0:
             _result = plist.readPlistFromString(p_result)
             LOG.debug(p_result)
 
