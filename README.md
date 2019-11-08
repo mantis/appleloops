@@ -7,7 +7,7 @@ A utility to manage the deployment of the additional audio content Apple provide
 - Pre built installer package is available. Installs to `/usr/local/bin`.
 - Now using `/usr/bin/env python`. Beware of Python versions when deploying!.
 - Supports deploying packages from a DMG file hosted over HTTP/HTTPS (use the `--pkg-server` flag and supply the full HTTP path to the DMG).
-- Building a DMG file now uses a temporary sparse image file to download packages directly into, the converts it to a DMG.
+- Building a DMG file now uses a temporary sparse image file to download packages directly into, then converts it to a DMG.
   - APFS file system supported with the `--APFS` flag. Defaults to HFS+ file system.
   - DMG's are now read only, and compressed.
   - DMG's will be written over if the same filename is specified.
@@ -36,11 +36,12 @@ A number of previous features are being deprecated from v3.0.0 onwards to avoid 
 - "Flat" directory structures for downloaded content no longer supported.
 - Specifying a disk space threshold to reserve.
   - When deploying, the goal is to ensure _all_ the packages of either mandatory/optional types get installed.
-- No longer a fully self contained script (script is now split out into a python package).
+- No longer a fully self contained script (script is now split out into a python package). Script is now zipped using `zipapp` Python 3 built-in.
 - Specifying a log path is no longer supported.
-- Will install all mandatory packages in deployment mode or will not install them at all. Same for optional packages (but I'm exploring some options for the optional packages for possible future version).
+- Will install all mandatory packages in deployment mode or will not install them at all. Same for optional packages.
 - `--debug` hard deprecated for `--log <level>`. For example: `--log DEBUG`.
 - Python 2.x support will be dropped in a future release in keeping with Apple's stance on Python shipping in future macOS releases. Will require Python 3.x to be installed (I don't currently have plans to write this in Swift).
+  - 2019-11-09 Note: When Apple removes Python 2 from macOS, this will only be tested/built against a Python 3 environment.
 - Determining the `--pkg-server` path based on the `munki` configuration on a machine that is managed with `munki` is no longer supported.
 - Automatically determining a Caching Server source to use is no longer supported. Specifying the server will be required if the `-c/--cache-server` argument is used.
 
