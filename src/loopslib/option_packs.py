@@ -115,7 +115,7 @@ class Pack(object):
                          'Packages': None}
 
         for kwarg, value in _valid_kwargs.items():
-            if kwarg in kwargs.keys():
+            if kwarg in [_key for _key, _value in kwargs.items()]:
                 setattr(self, kwarg, kwargs.get(kwarg, None))
             else:
                 setattr(self, kwarg, value)
