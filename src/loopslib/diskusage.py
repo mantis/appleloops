@@ -33,7 +33,7 @@ class DiskStats(object):
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         p_result, p_error = process.communicate()
 
-        if process.returncode is 0:
+        if process.returncode == 0:
             result = plist.readPlistFromString(p_result)
         else:
             print(p_error)
