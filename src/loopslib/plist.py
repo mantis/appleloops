@@ -47,7 +47,7 @@ def convert(obj):
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     p_result, p_error = process.communicate()  # 'p_error' is useless. Errors goe to stdout.
 
-    if process.returncode is 0:
+    if process.returncode == 0:
         result = p_result
     else:
         p_error = p_result
