@@ -28,8 +28,8 @@ LOG = logging.getLogger(__name__)
 class Application(object):
     """Class for attributes about an application."""
     def __init__(self, app):
-        if app not in config.APPS.keys():
-            print('Please specify an app from: \'{}\''.format(', '.join(config.APPS.keys())))
+        if app not in [_key for _key, _value in config.APPS.items()]:
+            print('Please specify an app from: \'{}\''.format(', '.join([_key for _key, _value in config.APPS.items()])))
             exit(1)
 
         # Set some essential internal attrs to populate if app exists
