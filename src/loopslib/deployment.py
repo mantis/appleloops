@@ -88,7 +88,7 @@ class LoopDeployment(object):
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         p_result, p_error = process.communicate()
 
-        if process.returncode is 0:
+        if process.returncode == 0:
             msg = '  Installed _PKG_'
             LOG.info('{}: {}'.format(' '.join(cmd), p_result))
         else:
@@ -121,7 +121,7 @@ class LoopDeployment(object):
 
                 install_result = self._installer(cmd=cmd)
                 msg = '{}'.format(install_result[1]).replace('_PKG_', pkg.DownloadName)
-                result = True if install_result[0] is 0 else False
+                result = True if install_result[0] == 0 else False
 
                 if not config.SILENT:
                     print(msg)
