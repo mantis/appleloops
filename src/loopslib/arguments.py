@@ -116,6 +116,31 @@ class LoopsArguments(object):
 
             self._plist_args.add_argument(*args, **kwargs)
 
+    def _mand_opt_check(self, err_msg, arg):
+        """Internal method to quickly print out mandatory/optional arg requirement."""
+        self.parser.print_usage(sys.stderr)
+        _msg = '{} {}: must provide at least -m/--mandatory or -o/--optional or both'.format(err_msg, arg)
+        print(_msg)
+        LOG.info(_msg)
+        sys.exit(1)
+
+    def _deploy_force_deploy_check(self, err_msg, arg):
+        """Internal method to quickly print out deploy/force deploy arg error."""
+        self.parser.print_usage(sys.stderr)
+        _msg = '{}: {}: not allowed with argument --deploy/--force-deploy'.format(err_msg, arg)
+        print(_msg)
+        LOG.info(_msg)
+        sys.exit(1)
+
+    def _dmg_download_force_download_check(self, err_msg, arg):
+        """INternal method to quickly print out build dmg/download/force download arg requirement."""
+        self.parser.print_usage(sys.stderr)
+        _msg = ('{}: {}: not allowed without argument -b/--build-dmg or -d/--destination '
+                'or -f/--force-destination'.format(err_msg, arg))
+        print(_msg)
+        LOG.info(_msg)
+        sys.exit(1)
+
     # pylint: disable=too-many-branches
     # pylint: disable=too-many-statements
     def parse_args(self):
@@ -136,69 +161,75 @@ class LoopsArguments(object):
 
             if not result.build_dmg:
                 self.parser.print_usage(sys.stderr)
-                _msg = '{} {}: --APFS: not allowed with argument -b/--build-dmg'.format(_err_msg, _arg)
+                _msg = '{} {}: --APFS: not allowed without argument -b/--build-dmg'.format(_err_msg, _arg)
                 print(_msg)
                 LOG.info(_msg)
                 sys.exit(1)
 
         # Check that at least on of the three apps is provided for download flag '-a/--apps'
-        if result.apps == 'allpkgs':
-            result.apps = config.ALL_LATEST_APPS
-        elif result.apps:
+        if result.apps:
             _arg = '-a/--apps'
             _apps = [_app for _app, _value in config.APPS.items()]
             _apps.extend(['allpkgs'])
             _apps.sort()
             _choices = ', '.join(["'{}'".format(_app) for _app in _apps])
 
-            if not any([app in result.apps for app in _apps]):
-                self.parser.print_usage(sys.stderr)
-                _msg = '{} {}: expected one argument: (choose from {})'.format(_err_msg, _arg, _choices)
-                print(_msg)
-                LOG.info(_msg)
-                sys.exit(1)
+            if 'allpkgs' in result.apps:
+                result.apps = config.ALL_LATEST_APPS
+            else:
+                if not any([app in result.apps for app in _apps]):
+                    self.parser.print_usage(sys.stderr)
+                    _msg = '{} {}: expected one argument: (choose from {})'.format(_err_msg, _arg, _choices)
+                    print(_msg)
+                    LOG.info(_msg)
+                    sys.exit(1)
+
+            if not (result.mandatory or result.optional):
+                self._mand_opt_check(err_msg=_err_msg, arg=_arg)
+
+            if result.deployment or result.force_deployment:
+                self._deploy_force_deploy_check(err_msg=_err_msg, arg=_arg)
+
+            # Even though presumption can be made about downloading to a temporary
+            # directory, can't assume that this is actually what is intended,
+            # so require specific argument to inform what action is to be taken.
+            if not (result.build_dmg or result.download or result.force_download):
+                self._dmg_download_force_download_check(err_msg=_err_msg, arg=_arg)
 
         # Handle plist argument exceptions
         if result.plists:
             _arg = '-p/--plists'
             # Make sure all items passed end with plist
-            _supported = config.SUPPORTED_PLISTS.keys()
+            _supported = ['allpkgs']
+            _supported.extend([_key for _key, _value in config.SUPPORTED_PLISTS.items()])
             _choices = ["'{}'".format(_plist) for _plist in _supported]
             _choices.sort()
             _choices = ', '.join(_choices)
-            _choices = '\'allpkgs\', {}'.format(_choices)
 
-            if result.plists == 'allpkgs':
-                result.plists = [config.SUPPORTED_PLISTS.get(_plist) for _plist in config.ALL_LATEST_PLISTS]
-            elif not any([_plist in _supported for _plist in result.plists]):
+            # Error check first, then process
+            if not any([_plist in _supported for _plist in result.plists]):
                 _msg = '{} {}: excpected one argument: (choose from {})'.format(_err_msg, _arg, _choices)
                 print(_msg)
                 LOG.info(_msg)
                 sys.exit(1)
-            else:
+
+            # Process after error checking
+            if 'allpkgs' in result.plists:
+                result.plists = [config.SUPPORTED_PLISTS.get(_plist) for _plist in config.ALL_LATEST_PLISTS]
+            elif 'allpkgs' not in result.plists:
                 result.plists = [config.SUPPORTED_PLISTS.get(_plist) for _plist in result.plists]
 
             if not (result.mandatory or result.optional):
-                self.parser.print_usage(sys.stderr)
-                _msg = '{} {}: must provide at least -m/--mandatory or -o/--optional or both'.format(_err_msg, _arg)
-                print(_msg)
-                LOG.info(_msg)
-                sys.exit(1)
+                self._mand_opt_check(err_msg=_err_msg, arg=_arg)
 
             if result.deployment or result.force_deployment:
-                self.parser.print_usage(sys.stderr)
-                _msg = '{}: {}: not allowed with argument --deploy/--force-deploy'.format(_err_msg, _arg)
-                print(_msg)
-                LOG.info(_msg)
-                sys.exit(1)
+                self._deploy_force_deploy_check(err_msg=_err_msg, arg=_arg)
 
+            # Even though presumption can be made about downloading to a temporary
+            # directory, can't assume that this is actually what is intended,
+            # so require specific argument to inform what action is to be taken.
             if not (result.build_dmg or result.download or result.force_download):
-                self.parser.print_usage(sys.stderr)
-                _msg = ('{}: {}: not allowed without argument -b/--build-dmg or -d/--destination '
-                        'or -f/--force-destination'.format(_err_msg, _arg))
-                print(_msg)
-                LOG.info(_msg)
-                sys.exit(1)
+                self._dmg_download_force_download_check(err_msg=_err_msg, arg=_arg)
 
         # Test if user is root for deploy/force deploy modes
         if not result.dry_run:
@@ -307,6 +338,9 @@ class LoopsArguments(object):
 
         # Handle building a DMG
         if result.build_dmg:
+            if not config.DMG_FILE.endswith('.dmg'):
+                config.DMG_FILE = '{}.dmg'.format(config.DMG_FILE)
+
             _dmg_path = os.path.splitext(config.DMG_FILE)[0]
             config.DESTINATION_PATH = '{}.sparseimage'.format(_dmg_path)
 
