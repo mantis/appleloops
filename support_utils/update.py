@@ -7,7 +7,6 @@ from __future__ import print_function
 # pylint: disable=too-many-nested-blocks
 
 import os
-import re
 import subprocess
 
 from datetime import datetime
@@ -58,7 +57,7 @@ def get_headers(url):
             p_result = p_result.strip().splitlines()
 
             for _line in p_result:
-                if re.match(r'^HTTP/\d{1}.\d{1} ', _line) and ':' not in _line:
+                if (_line.startswith('HTTP/1.1 ') or _line.startswith('HTTP/2 ')) and ':' not in _line:
                     result['Status'] = _line
 
                     # Set the status code as a seperate value so we can minimise curl usage.
@@ -86,7 +85,7 @@ def get_status(headers):
 
         # HTTP status codes should be the first three numbers of this header.
         if status:
-            result = re.sub(r'^HTTP/\d{1}.\d{1} ', '', status).split(' ')[0]
+            result = status.split(' ')[1]
 
     if result:
         try:
