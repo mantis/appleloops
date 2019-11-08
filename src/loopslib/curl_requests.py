@@ -1,6 +1,5 @@
 """Contains the class for using CURL."""
 import logging
-import re
 import os
 import subprocess
 
@@ -16,6 +15,7 @@ except ImportError:
 # pylint: enable=relative-import
 
 LOG = logging.getLogger(__name__)
+os.environ['CURLOPT_HTTP_VERSION'] = 'CURL_HTTP_VERSION_2_0'
 
 
 class CURL(object):
@@ -62,7 +62,7 @@ class CURL(object):
         p_result, p_error = process.communicate()
 
         # pylint: disable=too-many-nested-blocks
-        if process.returncode is 0:
+        if process.returncode == 0:
             if isinstance(p_result, bytes):
                 result = dict()
                 # There's a trailing `\n` in the output, so tidy it up.
@@ -77,7 +77,7 @@ class CURL(object):
                 p_result = p_result.strip().splitlines()
 
                 for line in p_result:
-                    if re.match(r'^HTTP/\d{1}.\d{1} ', line) and ':' not in line:
+                    if (line.startswith('HTTP/1.1 ') or line.startswith('HTTP/2 ')) and ':' not in line:
                         result['Status'] = line
 
                         # Set the status code as a seperate value so we can minimise curl usage.
@@ -91,7 +91,7 @@ class CURL(object):
 
                             result[key] = value
                 LOG.debug('{}: {}'.format(' '.join(cmd), result))
-        elif process.returncode in curl_errors.CURL_ERRORS.keys():
+        elif process.returncode in [_key for _key, _value in curl_errors.CURL_ERRORS.items()]:
             _err_msg = curl_errors.CURL_ERRORS.get(process.returncode, None)
 
             # Set the 'self.curl_error' attribute to the error received.
@@ -117,9 +117,9 @@ class CURL(object):
         if self.headers:
             status = self.headers.get('Status', None)
 
-            # HTTP status codes should be the first three numbers of this header.
+            # HTTP status codes after the 'HTTP/X' part
             if status:
-                result = re.sub(r'^HTTP/\d{1}.\d{1} ', '', status).split(' ')[0]
+                result = status.split(' ')[1]
 
         if result:
             try:
