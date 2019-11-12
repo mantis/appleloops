@@ -2,6 +2,8 @@
 import logging
 import os
 import re
+import sys
+import tempfile
 
 from distutils.version import LooseVersion
 from glob import glob
@@ -10,15 +12,19 @@ from glob import glob
 try:
     import bad_wolf
     import config
+    import curl_requests
     import option_packs
     import package
     import plist
+    import supported
 except ImportError:
     from . import bad_wolf
     from . import config
+    from . import curl_requests
     from . import option_packs
     from . import package
     from . import plist
+    from . import supported
 # pylint: enable=relative-import
 
 LOG = logging.getLogger(__name__)
@@ -95,7 +101,61 @@ class Application(object):
             # Return the last matching file as this should be the most recent
             matching_files.sort(reverse=False)
 
-            result = matching_files[-1]
+            if isinstance(matching_files, list):
+                try:
+                    result = matching_files[-1]
+                except IndexError:  # Oh-oh! The resource might not exist, so fall back to Apple
+                    LOG.debug('Resource file excpected in {} app folder not found. Falling back to Apple source.'.format(self._app))
+
+                    _url = None
+                    _failover_url = None
+                    _tmp_dir = os.path.join(tempfile.gettempdir(), config.BUNDLE_ID)
+                    _file = None
+                    _app_ver = self._app_info.get('CFBundleShortVersionString', None).replace('.', '')
+                    _supported_plists = [_value for _key, _value in supported.SUPPORTED.items() if self._app in _value]
+                    _supported_plists.sort()
+
+                    _i = 0  # Index the while loop from here.
+
+                    while _i < len(_supported_plists):
+                        _first = int(_supported_plists[_i].replace(self._app, '').replace('.plist', ''))
+                        _second = None
+
+                        try:
+                            _ii = _i + 1
+                            _second = int(_supported_plists[_ii].replace(self._app, '').replace('.plist', ''))
+                        except KeyError:
+                            _second = int(_first) + 1
+
+                        if _first and _second:
+                            if int(_app_ver) in range(_first, _second):
+                                _file = _supported_plists[_i]
+                                break
+                        else:
+                            LOG.debug('Uh oh, could not find a second file in the supported files to check version range')
+                            result = None
+                            break
+                        _i += 1
+
+                    if _file:
+                        _url = '{}/{}/{}'.format(config.AUDIOCONTENT_URL, config.LP10_MS3_CONTENT, _file)
+                        _failover_url = '{}/{}/{}'.format(config.AUDIOCONTENT_FAILOVER_URL, config.LP10_MS3_CONTENT, _file)
+                        _tmp_file = os.path.join(_tmp_dir, _file)
+                        _req = curl_requests.CURL(url=_url)
+
+                        # NOTE 2019-11-04: Seems that using the 'resume' capability in cURL does not
+                        # work here now for some reason, so don't resume.
+                        if _req.status in config.HTTP_OK_STATUS:
+                            _req.get(url=_url, output=_tmp_file, resume=False)
+                        else:
+                            _req.get(url=_failover_url, output=_tmp_file, resume=False)
+
+                        if os.path.exists(_tmp_file):
+                            result = _tmp_file
+                        else:
+                            LOG.debug('File {} not found.'.format(_tmp_file))
+                            LOG.debug('URL for replacement file: {}'.format(_url))
+                            LOG.debug('Failover URL for replacement file: {}'.format(_failover_url))
 
         return result
 
