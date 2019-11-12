@@ -7,9 +7,11 @@ from os import path
 
 # pylint: disable=relative-import
 try:
+    import config
     import misc
     import plist
 except ImportError:
+    from . import config
     from . import misc
     from . import plist
 # pylint: enable=relative-import
@@ -21,7 +23,7 @@ class DiskStats(object):
     """Class for attributes about disk usage."""
     # def __init__(self, disk=None, space_used=None):
     def __init__(self, disk=None):
-        self._disk = disk if disk and path.exists(disk) else '/'
+        self._disk = disk if disk and path.exists(disk) else config.TARGET
 
         self.space_used = None
 
