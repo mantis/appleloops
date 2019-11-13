@@ -25,6 +25,11 @@ class DiskStats(object):
     def __init__(self, disk=None):
         self._disk = disk if disk and path.exists(disk) else config.TARGET
 
+        if config.CATALINA:
+            self._freespace_key = 'APFSContainerFree'
+        else:
+            self._freespace_key = 'FreeSpace'
+
         self.space_used = None
 
     def _get_disk_stats(self):
@@ -48,7 +53,7 @@ class DiskStats(object):
         """Returns a True/False if there is enough free space."""
         result = None
 
-        _freespace = self._get_disk_stats()['FreeSpace']
+        _freespace = self._get_disk_stats()[self._freespace_key]
 
         if all([isinstance(value, int) for value in [space_used, _freespace]]):
             result = space_used < _freespace
@@ -67,7 +72,7 @@ class DiskStats(object):
         """Returns the amount of free space as a byte value (int)."""
         result = None
 
-        result = self._get_disk_stats()['FreeSpace']
+        result = self._get_disk_stats()[self._freespace_key]
 
         return result
 

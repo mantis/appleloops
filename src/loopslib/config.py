@@ -2,7 +2,9 @@
 These must not be modified or behaviour could break."""
 import logging
 
+from distutils.version import LooseVersion
 from os import path
+from platform import mac_ver
 
 # pylint: disable=relative-import
 try:
@@ -60,6 +62,10 @@ DEPLOY_PKGS = False
 FORCED_DEPLOYMENT = False
 
 # Destination path (a default value is provided)
+# NOTE: '/tmp' is used because in some circumstances, the
+# destination needs to be human friendly, and the
+# python 'tempfile' packageg uses the unfriendly `/var/db`
+# based temp folders.
 DEFAULT_DEST = '/tmp/appleloops'
 DESTINATION_PATH = None
 FORCE_DOWNLOAD = False
@@ -135,8 +141,14 @@ SILENT = False
 # All supported plists
 SUPPORTED_PLISTS = supported.SUPPORTED.copy()
 
+# Capture OS Version
+OS_VER = LooseVersion(mac_ver()[0])
+
+# Post Catalina, the disk containers and volumes change a bit
+CATALINA = OS_VER >= LooseVersion('10.15.0')
+
 # Target (this is for the 'installer' command.)
-# Default is '/'
+# Using a different target for Catalina doesn't appear necessary.
 TARGET = '/'
 
 # User Agent string to use for all requests to Apple.
