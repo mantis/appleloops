@@ -187,14 +187,12 @@ class LoopsArguments(object):
             if not (result.mandatory or result.optional):
                 self._mand_opt_check(err_msg=_err_msg, arg=_arg)
 
-            if result.deployment or result.force_deployment:
-                self._deploy_force_deploy_check(err_msg=_err_msg, arg=_arg)
-
             # Even though presumption can be made about downloading to a temporary
             # directory, can't assume that this is actually what is intended,
             # so require specific argument to inform what action is to be taken.
             if not (result.build_dmg or result.download or result.force_download):
-                self._dmg_download_force_download_check(err_msg=_err_msg, arg=_arg)
+                if not (result.deployment or result.force_deployment):
+                    self._dmg_download_force_download_check(err_msg=_err_msg, arg=_arg)
 
         # Handle plist argument exceptions
         if result.plists:
@@ -222,6 +220,8 @@ class LoopsArguments(object):
             if not (result.mandatory or result.optional):
                 self._mand_opt_check(err_msg=_err_msg, arg=_arg)
 
+            # While it is possible to use the `-a/--apps` argument with the deployment arguments,
+            # it is a bad idea to try it with the `-p/--plists` argument because reasons.
             if result.deployment or result.force_deployment:
                 self._deploy_force_deploy_check(err_msg=_err_msg, arg=_arg)
 
@@ -314,7 +314,7 @@ class LoopsArguments(object):
         config.OPTIONAL = result.optional
         config.QUIET = result.quiet
         config.SILENT = result.silent
-        config.TARGET = result.install_target[0] if result.install_target else '/'
+        config.TARGET = result.install_target[0] if result.install_target else config.TARGET
 
         # Handle result.download/result.force_download
         if result.download or result.force_download:
