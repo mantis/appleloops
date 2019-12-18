@@ -145,7 +145,7 @@ SUPPORTED_PLISTS = supported.SUPPORTED.copy()
 OS_VER = LooseVersion(mac_ver()[0])
 
 # Post Catalina, the disk containers and volumes change a bit
-CATALINA = OS_VER >= LooseVersion('10.15.0')
+CATALINA = OS_VER > LooseVersion('10.14.9')
 
 # Target (this is for the 'installer' command.)
 # Using a different target for Catalina doesn't appear necessary.
