@@ -133,7 +133,7 @@ class LoopsArguments(object):
         sys.exit(1)
 
     def _dmg_download_force_download_check(self, err_msg, arg):
-        """INternal method to quickly print out build dmg/download/force download arg requirement."""
+        """Internal method to quickly print out build dmg/download/force download arg requirement."""
         self.parser.print_usage(sys.stderr)
         _msg = ('{}: {}: not allowed without argument -b/--build-dmg or -d/--destination '
                 'or -f/--force-destination'.format(err_msg, arg))
