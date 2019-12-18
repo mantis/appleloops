@@ -205,15 +205,6 @@ class LoopPackage(object):
                 elif isinstance(self.FileCheck, str):
                     files_installed = path.exists(self.FileCheck)
 
-            # if hasattr(self, 'MissingContentOnly'):
-            #     if all([check is True for check in [files_installed, pkg_bundle]]):
-            #         if self.MissingContentOnly:
-            #             # Set this to 'False' so that the all() below trips.
-            #             missing_content_only = False
-            #         elif not self.MissingContentOnly:
-            #             missing_content_only = True
-
-            # result = all([check is True for check in [files_installed, pkg_bundle, missing_content_only]])
             result = all([check is True for check in [files_installed, pkg_bundle]])
         elif not config.DEPLOY_PKGS:
             result = False
@@ -302,7 +293,6 @@ class InstalledPackageInfo(object):
 
         if process.returncode == 0:
             _result = plist.readPlistFromString(p_result)
-            LOG.debug(p_result)
 
             if _result:
                 result = dict()
@@ -313,13 +303,14 @@ class InstalledPackageInfo(object):
                         value = LooseVersion(value)
 
                     result[key.replace('-', '_')] = value
+
+                LOG.debug('{}: {}'.format(' '.join(cmd), result))
             else:
                 result = False
         else:
-            LOG.debug(p_error)
+            LOG.debug(p_error.decode('utf-8').strip())
             result = False
 
-        LOG.debug('{}: {}'.format(' '.join(cmd), result))
         return result
     # pylint: enable=no-self-use
 # pylint: enable=no-member
