@@ -49,6 +49,8 @@ class LoopDeployment(object):
         """Downloads a package from the specified URL."""
         if isinstance(pkg, package.LoopPackage):
             _url = pkg.DownloadURL
+            _cache_race = False  # Presume all caching server packages are completely downloaded
+            _debug_msg = 'Fell back {} to {}'.format(_url, pkg.DownloadURL)
 
             curl = curl_requests.CURL()
 
@@ -60,20 +62,42 @@ class LoopDeployment(object):
             # Get the status of the URL to see if it exists
             req = curl_requests.CURL(url=_url)
 
+            # Check if a caching server package is less than the expected size,
+            # if this is true, then it's likely the caching server hasn't completely
+            # downloaded the file yet, and will cause problems, so fall back.
+            if config.CACHING_SERVER:
+                try:
+                    if config.REAL_DOWNLOAD_SIZE:
+                        _cache_race = req.headers['Content-Length'] < pkg.RealDownloadSize
+                    else:
+                        _cache_race = req.headers['Content-Length'] < pkg.DownloadSize
+                except KeyError:
+                    if config.REAL_DOWNLOAD_SIZE:
+                        _cache_race = req.headers['content-length'] < pkg.RealDownloadSize
+                    else:
+                        _cache_race = req.headers['content-length'] < pkg.DownloadSize
+
+                if _cache_race:
+                    _debug_msg = '{} (Possible Caching Server race condition when downloading package)'.format(_debug_msg)
+
             if req.status:
                 if req.status in config.HTTP_OK_STATUS:
                     curl.get(url=_url, output=pkg.DownloadPath, counter_msg=counter_msg)
                 elif req.status not in config.HTTP_OK_STATUS:
                     # Fallback only if the url is either a cache or pkg server
-                    if _url in [pkg.LocalDownloadURL, pkg.CacheDownloadURL]:
-                        LOG.debug('Fell back {} to {}'.format(_url, pkg.DownloadURL))
+                    if _url in [pkg.LocalDownloadURL, pkg.CacheDownloadURL] or _cache_race:
+                        LOG.debug(_debug_msg)
+
                         _url = pkg.DownloadURL
+
                         curl.get(url=_url, output=pkg.DownloadPath, counter_msg=counter_msg)
             elif not req.status or req.curl_error:
                 # Fallback only if the url is either a cache or pkg server
-                if _url in [pkg.LocalDownloadURL, pkg.CacheDownloadURL]:
-                    LOG.debug('Fell back {} to {}'.format(_url, pkg.DownloadURL))
+                if _url in [pkg.LocalDownloadURL, pkg.CacheDownloadURL] or _cache_race:
+                    LOG.debug(_debug_msg)
+
                     _url = pkg.DownloadURL
+
                     curl.get(url=_url, output=pkg.DownloadPath, counter_msg=counter_msg)
         else:
             LOG.debug('{} is {}'.format(pkg, pkg.__class__))
