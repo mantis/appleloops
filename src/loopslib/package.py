@@ -130,6 +130,8 @@ class LoopPackage(object):
         # pylint: enable=access-member-before-definition
 
         # CURL requests for actual download sizes but only if specified.
+        # Turns out the data in the Apple feed files is pretty accurate.
+        # So querying the real download size is practically pointless.
         if config.REAL_DOWNLOAD_SIZE:
             if self.LocalDownloadURL:
                 req = curl_requests.CURL(url=self.LocalDownloadURL)
