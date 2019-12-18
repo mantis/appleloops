@@ -26,15 +26,24 @@ import os
 from datetime import datetime
 from pprint import pprint  # NOQA
 
-# import loopslib  # NOQA
-from loopslib import applications
-from loopslib import arguments
-from loopslib import config
-from loopslib import diskusage
-from loopslib import deployment
-from loopslib import dmg
-from loopslib import misc
-from loopslib import process_source
+try:
+    from loopslib import applications
+    from loopslib import arguments
+    from loopslib import config
+    from loopslib import diskusage
+    from loopslib import deployment
+    from loopslib import dmg
+    from loopslib import misc
+    from loopslib import process_source
+except ModuleNotFoundError:
+    from .loopslib import applications
+    from .loopslib import arguments
+    from .loopslib import config
+    from .loopslib import diskusage
+    from .loopslib import deployment
+    from .loopslib import dmg
+    from .loopslib import misc
+    from .loopslib import process_source
 
 
 # pylint: disable=invalid-name
