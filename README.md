@@ -2,7 +2,7 @@
 A utility to manage the deployment of the additional audio content Apple provides for GarageBand, Logic Pro X, and MainStage 3.
 
 ## What's New in v3.1.4+
-- The `build.sh` script can be run with custom python paths provided. For example
+- The `build.sh` script can be run with custom python paths provided.<br />For example
 ```./build.sh --python="/usr/local/bin/python3.7"```
 
 ### What's New in v3.0.0+
