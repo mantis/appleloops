@@ -1,5 +1,4 @@
 PKGTITLE="appleloops"
-# PKGVERSION="3.0.0"
 PKG_VERSION:=$(shell /usr/bin/awk -F '=' '/VERSION = / {print $$2}' src/loopslib/version.py | /usr/bin/sed -e "s/'//g" -e "s/ //g")
 PKGVERSION="${PKG_VERSION}"
 BUNDLEID="com.github.carlashley.appleloops"

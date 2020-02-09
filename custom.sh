@@ -2,7 +2,7 @@
 
 LOCAL_PYTHON=$(/usr/bin/which python3)
 
-BUILD_DIR=dist/zipapp/usr/local/bin
+BUILD_DIR=dist/custom/zipapp/usr/local/bin
 BUILD_OUT=${BUILD_DIR}/appleloops
 
 if [ ${LOCAL_PYTHON} == '' ]; then
@@ -28,6 +28,5 @@ eval ${DIST_CMD}
 # If the file exists, we can build the pkg
 if [ -f ${BUILD_OUT} ]; then
     /bin/chmod +x ${BUILD_OUT}
-    /bin/cp ${BUILD_OUT} .
-    /usr/bin/make
+    /usr/bin/make --file=dist/custom/Makefile
 fi
