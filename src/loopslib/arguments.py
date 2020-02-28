@@ -86,7 +86,7 @@ class LoopsArguments(object):
         self._deploy_args = self.parser.add_mutually_exclusive_group()
         self._plist_args = self.parser.add_mutually_exclusive_group()
 
-        self._valid_url_schemes = ['http', 'https']
+        self._valid_url_schemes = ['file', 'http', 'https']
 
         self._construct_args()
 
@@ -279,10 +279,23 @@ class LoopsArguments(object):
             _arg = '--pkg-server'
             _ps = result.pkg_server[0]
             _url = urlparse(_ps)
+            _scheme = _url.scheme
 
-            if _url.scheme not in self._valid_url_schemes or not _url.path:
+            if not _scheme:
+                if _url.path.endswith('.dmg'):
+                    _scheme = 'file'
+                    config.DMG_DEPLOY_FILE = _url.path
+
+            if _scheme == 'file':
+                if not os.path.exists(_url.path):
+                    _msg = ('{} {}: the specified file path {} does not exist.'.format(_err_msg, _arg, _url.path))
+                    print(_msg)
+                    LOG.info(_msg)
+                    sys.exit(1)
+
+            if _scheme not in self._valid_url_schemes or not _url.path:
                 _msg = ('{} {}: mirror server url format expected is https://example.org/<path> '
-                        'or https://example.org/file.dmg'.format(_err_msg, _arg))
+                        'or https://example.org/file.dmg or /path/to/appleloops.dmg'.format(_err_msg, _arg))
                 print(_msg)
                 LOG.info(_msg)
                 sys.exit(1)
@@ -307,6 +320,7 @@ class LoopsArguments(object):
         config.DEBUG = getattr(logging, result.log_level, None)
         config.DEPLOY_PKGS = result.deployment
         config.FORCED_DEPLOYMENT = result.force_deployment
+        config.DMG_DEPLOY_FILE = config.DMG_DEPLOY_FILE if config.DMG_DEPLOY_FILE else None
         config.DMG_FILE = result.build_dmg[0] if result.build_dmg else None
         config.DRY_RUN = result.dry_run
         config.LOCAL_HTTP_SERVER = result.pkg_server[0].rstrip('/') if result.pkg_server else None

@@ -139,7 +139,11 @@ class ProcessedSource(object):
         self.all_download_size = self._all_download_size()
         self.all_install_size = self._all_install_size()
 
-        self.total_size_req = self.all_download_size + self.all_install_size
+        if config.DMG_DEPLOY_FILE:
+            self.total_size_req = self.all_install_size
+        else:
+            self.total_size_req = self.all_download_size + self.all_install_size
+
         self.total_size_req_hr = misc.bytes2hr(byte=self.total_size_req)
 
         self.all_download_size_hr = self._all_download_size_hr()
@@ -172,16 +176,27 @@ class ProcessedSource(object):
         self.mandatory_dld_ins_msg = 'Mandatory packages download/install size: {}/{} ({} packages)'.format(
             self.mandatory_download_size_hr, self.mandatory_install_size_hr, self.mandatory_qty
         )
-        LOG.debug(self.mandatory_dld_ins_msg)
 
         self.optional_dld_ins_msg = 'Optional packages download/install size: {}/{} ({} packages)'.format(
             self.optional_download_size_hr, self.optional_install_size_hr, self.optional_qty
         )
-        LOG.debug(self.optional_dld_ins_msg)
 
         self.all_dld_ins_msg = 'All packages download/install size: {}/{} ({}) packages'.format(
             self.all_download_size_hr, self.all_install_size_hr, self.all_qty
         )
+
+        if config.DMG_DEPLOY_FILE:
+            self.mandatory_dld_ins_msg = self.mandatory_dld_ins_msg.replace('download/install', 'install')
+            self.mandatory_dld_ins_msg = self.mandatory_dld_ins_msg.replace('{}/'.format(self.mandatory_download_size_hr), '')
+
+            self.optional_dld_ins_msg = self.optional_dld_ins_msg.replace('download/install', 'install')
+            self.optional_dld_ins_msg = self.optional_dld_ins_msg.replace('{}/'.format(self.optional_download_size_hr), '')
+
+            self.all_dld_ins_msg = self.all_dld_ins_msg.replace('download/install', 'install')
+            self.all_dld_ins_msg = self.all_dld_ins_msg.replace('{}/'.format(self.all_download_size_hr), '')
+
+        LOG.debug(self.mandatory_dld_ins_msg)
+        LOG.debug(self.optional_dld_ins_msg)
         LOG.debug(self.all_dld_ins_msg)
 
         self.stats_message = '{}'.format(self.all_dld_ins_msg)

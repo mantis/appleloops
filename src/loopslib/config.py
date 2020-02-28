@@ -72,6 +72,7 @@ FORCE_DOWNLOAD = False
 
 # DMG File stuff
 APFS_DMG = False
+DMG_DEPLOY_FILE = None
 DMG_FILE = None
 DMG_DISK_DEV = None  # Required because APFS is a bit funky when ejecting.
 DMG_VOLUME_MOUNTPATH = None

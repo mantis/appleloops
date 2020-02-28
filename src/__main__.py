@@ -129,10 +129,18 @@ def main():
     if packages.all:
         if config.DEPLOY_PKGS or config.FORCED_DEPLOYMENT:
             if not disk.has_space(space_requested=packages.total_size_req):
-                _msg = ('Insufficient space to install packages. Free up more space to continue. '
+                _msg = ('Insufficient space to download and install packages. Free up more space to continue. '
                         'Download and install size is {}.'.format(packages.total_size_req_hr))
+
                 _dbg = ('Insufficient space. {} download total and {} install total.'.format(packages.all_download_size_hr,
                                                                                              packages.all_install_size_hr))
+
+                if config.DMG_DEPLOY_FILE:
+                    _msg = _msg.replace('download and install ', 'install ')
+                    _msg = _msg.replace('Download and install ', 'Install ')
+                    _dbg = ('Insufficient space. {} install total.'.format(packages.all_download_size_hr,
+                                                                           packages.all_install_size_hr))
+
                 logging.info(_msg)
                 logging.debug(_dbg)
                 print(_msg)
