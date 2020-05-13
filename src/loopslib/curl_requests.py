@@ -15,7 +15,6 @@ except ImportError:
 # pylint: enable=relative-import
 
 LOG = logging.getLogger(__name__)
-os.environ['CURLOPT_HTTP_VERSION'] = 'CURL_HTTP_VERSION_2_0'
 
 
 class CURL(object):
