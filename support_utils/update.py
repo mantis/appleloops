@@ -19,7 +19,7 @@ LP10_DIR = os.path.join(BASE_DIR, 'lp10_ms3_content_2016')
 LIB_DIR = os.path.join(BASE_DIR, 'src', 'loopslib')
 SUPPORTED_FILE = os.path.join(LIB_DIR, 'supported.py')
 VERSION_FILE = os.path.join(LIB_DIR, 'version.py')
-CURL_PATH = ['/usr/bin/curl']
+CURL_PATH = ['/usr/bin/curl', '--http1.1']
 APPLE_URL = 'https://audiocontentdownload.apple.com/lp10_ms3_content_2016'
 
 APPS = {'garageband': range(1010, 1099),

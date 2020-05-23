@@ -54,6 +54,9 @@ CACHING_SERVER = None
 # Do not override.
 CONTENTS_PATH = 'Contents'
 
+CURL_HTTP1 = True
+CURL_HTTP_ARG = '--http1.1'
+
 # Debug on/off
 DEBUG = False
 

@@ -44,6 +44,7 @@ class CURL(object):
                              '308 Permanent Redirect']
 
         cmd = [self._curl_path,
+               config.CURL_HTTP_ARG,
                '--user-agent',
                config.USERAGENT,
                '--silent',  # Getting headers/status should always be silent.
@@ -135,6 +136,7 @@ class CURL(object):
 
         # Now the command.
         cmd = [self._curl_path,
+               config.CURL_HTTP_ARG,
                '--user-agent',
                config.USERAGENT]
 

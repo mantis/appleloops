@@ -117,5 +117,14 @@ BAD_WOLF_PKGS = {
             'BadWolfIgnore': True,
             'Comment': 'ghIssue:29'
         },
+    },
+    'logicpro1050.plist': {  # This is the source file to apply changes to
+        # This is the package name that matches to 'garageband1021.plist['Packages'][<pkg_name>]'
+        'MAContent10_AssetPack_0357_EXS_BassAcousticUprightJazz': {
+            # This key exists, so this value updates existing value.
+            'FileCheck': '/Library/Application Support/Logic/Logic Pro X Demosongs/ocean eyes.logicx/Alternatives/001/DisplayState.plist',
+            # This is a new key, so gets added. Used to track related GitHub issue.
+            'Comment': 'appleloops/3.1.7/ghIssue:3'
+        },
     }
 }

@@ -313,6 +313,10 @@ class LoopsArguments(object):
         if not result.apps:
             config.PLISTS_TO_PROCESS = result.plists
 
+        if result.http2:
+            config.CURL_HTTP1 = False if result.http2 else True
+            config.CURL_HTTP_ARG = '--http2'
+
         config.ALLOW_INSECURE_CURL = result.insecure
         config.ALLOW_UNSECURE_PKGS = result.unsecure
         config.APFS_DMG = result.apfs_dmg
@@ -323,6 +327,7 @@ class LoopsArguments(object):
         config.DMG_DEPLOY_FILE = config.DMG_DEPLOY_FILE if config.DMG_DEPLOY_FILE else None
         config.DMG_FILE = result.build_dmg[0] if result.build_dmg else None
         config.DRY_RUN = result.dry_run
+        config.CURL_HTTP1 = False if result.http2 else True
         config.LOCAL_HTTP_SERVER = result.pkg_server[0].rstrip('/') if result.pkg_server else None
         config.MANDATORY = result.mandatory
         config.OPTIONAL = result.optional
