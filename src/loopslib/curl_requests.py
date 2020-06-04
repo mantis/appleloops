@@ -2,6 +2,7 @@
 import logging
 import os
 import subprocess
+import sys
 
 # pylint: disable=relative-import
 try:
@@ -168,7 +169,7 @@ class CURL(object):
 
         if not config.DRY_RUN or _fetching_plist:
             if counter_msg:
-                _msg = 'Downloading {} - {}'.format(counter_msg, url)
+                _msg = 'Downloading file {} - {}'.format(counter_msg, url)
             else:
                 _msg = 'Downloading {}'.format(url)
 
@@ -176,12 +177,38 @@ class CURL(object):
                 _msg = _msg.replace('Downloading', 'Re-downloading')
 
             try:
-                LOG.info(_msg)
+                if not os.path.exists(output):
+                    LOG.info(_msg)
 
-                if not (config.SILENT or self._silent_override or _fetching_plist):
-                    print(_msg)
+                    if not (config.SILENT or self._silent_override or _fetching_plist):
+                        print(_msg)
 
-                subprocess.check_call(cmd)
+                    subprocess.check_call(cmd)
+                elif os.path.exists(output):
+                    _local_len = os.path.getsize(output)
+                    _content_len = None
+
+                    try:
+                        _content_len = self._get_headers(obj=url)['Content-Length']
+                    except KeyError:
+                        _content_len = self._get_headers(obj=url)['content-length']
+
+                    if _content_len and _local_len == _content_len:
+                        _msg = _msg.replace('Re-downloading', 'Downloading')
+                        _msg = _msg.replace('Downloading', 'Skipping existing file')
+                        LOG.info(_msg)
+
+                        if not (config.SILENT or self._silent_override or _fetching_plist):
+                            print(_msg)
+                    elif not _content_len or (_content_len and _local_len != _content_len):
+                        _msg = _msg.replace('Re-downloading', 'Downloading')
+                        _msg = _msg.replace('Downloading', 'Resuming')
+                        LOG.info(_msg)
+
+                        if not (config.SILENT or self._silent_override or _fetching_plist):
+                            print(_msg)
+
+                        subprocess.check_call(cmd)
             except subprocess.CalledProcessError as _e:
                 LOG.debug('{}: {}'.format(' '.join(cmd), _e))
                 raise _e
