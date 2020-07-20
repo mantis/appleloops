@@ -126,5 +126,12 @@ BAD_WOLF_PKGS = {
             # This is a new key, so gets added. Used to track related GitHub issue.
             'Comment': 'appleloops/3.1.7/ghIssue:22'
         },
+        'MAContent10_AssetPack_0755_AppleLoopsPrismatica': {
+            # This key exists, so this value updates existing value.
+            'DownloadName': 'MAContent10_AssetPack_0801_AppleLoopsPrismaticaB.pkg',
+            'PackageID': 'MAContent10_AssetPack_0801_AppleLoopsPrismaticaB',
+            # This is a new key, so gets added. Used to track related GitHub issue.
+            'Comment': 'appleloops/3.1.8/ghIssue:21'
+        },
     }
 }
