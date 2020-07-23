@@ -115,6 +115,14 @@ class LoopDeployment(object):
         if process.returncode == 0:
             msg = '  Installed _PKG_'
             LOG.info('{}: {}'.format(' '.join(cmd), p_result))
+
+            # Debug log installer '-dumplog' value.
+            try:
+                _installer_dumplog_msg = p_error.decode('utf-8')
+            except Exception:
+                _installer_dumplog_msg = p_error
+
+            LOG.debug(_installer_dumplog_msg)
         else:
             msg = (' Error installing _PKG_. \'/var/log/install.log\' may include additional'
                    ' information.')
@@ -129,7 +137,7 @@ class LoopDeployment(object):
         result = None
         filename = os.path.join(config.DESTINATION_PATH, pkg.DownloadPath)
 
-        cmd = ['/usr/sbin/installer', '-pkg', filename, '-target', config.TARGET]
+        cmd = ['/usr/sbin/installer', '-dumplog', '-pkg', filename, '-target', config.TARGET]
 
         if config.ALLOW_UNSECURE_PKGS:
             cmd.insert(1, '-allowUntrusted')  # Insert at index 1, shifts right
