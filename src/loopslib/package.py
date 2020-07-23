@@ -155,7 +155,7 @@ class LoopPackage(object):
     # pylint: disable=no-else-return
     def __hash__(self):
         """Hash a tuple (immutable) containing the package 'DownloadName' attribute."""
-        if isinstance(self, LoopPackage):
+        if isinstance(self, self.__class__):
             return hash(('DownloadName', self.DownloadName))
         else:
             return NotImplemented
@@ -163,7 +163,7 @@ class LoopPackage(object):
     def __eq__(self, other):
         """Used for testing equality of a package instance based on the package 'DownloadName'
         attribute."""
-        if isinstance(self, LoopPackage):
+        if isinstance(other, self.__class__):
             return self.DownloadName == other.DownloadName
         else:
             return NotImplemented
@@ -171,7 +171,7 @@ class LoopPackage(object):
     def __ne__(self, other):
         """Used for testing 'not' equality of a package instance based on the package
         'DownloadName' attribute. Implemented for Python 2.7 compatibility."""
-        if isinstance(self, LoopPackage):
+        if isinstance(other, self.__class__):
             return not self.DownloadName == other.DownloadName
         else:
             return NotImplemented
@@ -191,11 +191,20 @@ class LoopPackage(object):
 
             if hasattr(self, 'PackageID'):
                 pkginfo = InstalledPackageInfo(obj=self.PackageID)
-                pkg_bundle = self.PackageID == pkginfo.pkgid
 
-                # Set some other package attributes that might be useful
-                self.InstalledVersion = pkginfo.pkg_version
-                self.InstalledDate = pkginfo.install_time
+                if pkginfo:
+                    # Tests if the package being processed has been installed by comparing
+                    # the 'PackageID' attribute of the remote package with any package ID's
+                    # in the output of the subprocessed 'pkgutil --pkgs' output.
+                    pkg_bundle = self.PackageID == pkginfo.pkgid
+
+                    # Set some other package attributes that might be useful
+                    self.InstalledVersion = pkginfo.pkg_version
+                    self.InstalledDate = pkginfo.install_time
+                else:
+                    pkg_bundle = False
+                    self.InstalledVersion = None
+                    self.InstalledDate = None
 
             if hasattr(self, 'FileCheck'):
                 if isinstance(self.FileCheck, list):
@@ -262,14 +271,14 @@ class InstalledPackageInfo(object):
     # pylint: disable=no-else-return
     def __hash__(self):
         """Hash a tuple (immutable) containing the 'pkgid' attribute."""
-        if isinstance(self, InstalledPackageInfo):
+        if isinstance(self, self.__class__):
             return hash(('pkgid', self.pkgid))
         else:
             return NotImplemented
 
-    def __eq__(self, other):
+    def __eq__(other, self):
         """Used for testing equality of a package instance based on the 'pkginfo' attribute."""
-        if isinstance(self, InstalledPackageInfo):
+        if isinstance(other, self.__class__):
             return self.pkgid == other.pkgid
         else:
             return NotImplemented
@@ -277,7 +286,7 @@ class InstalledPackageInfo(object):
     def __ne__(self, other):
         """Used for testing 'not' equality  'pkginfo' attribute.
         Implemented for Python 2.7 compatibility."""
-        if isinstance(self, InstalledPackageInfo):
+        if isinstance(other, self.__class__):
             return not self.pkgid == other.pkgid
         else:
             return NotImplemented
@@ -310,8 +319,11 @@ class InstalledPackageInfo(object):
             else:
                 result = False
         else:
-            LOG.debug(p_error.decode('utf-8').strip())
             result = False
+
+            # Only care to log if the error does not contain specific text.
+            if 'No receipt for \'{}\''.format(package_id) not in p_error.decode('utf-8').strip():
+                LOG.debug(p_error.decode('utf-8').strip())
 
         return result
     # pylint: enable=no-self-use

@@ -131,7 +131,7 @@ class Pack(object):
 
     def __eq__(self, other):
         """Used for testing equality of a pack instance based on the 'Name' attribute."""
-        if isinstance(self, Pack):
+        if isinstance(other, self.__class__):
             return self.Name == other.Name
         else:
             return NotImplemented
@@ -139,7 +139,7 @@ class Pack(object):
     def __ne__(self, other):
         """Used for testing 'not' equality of a pack instance based on the 'Name' attribute.
         Implemented for Python 2.7 compatability."""
-        if isinstance(self, Pack):
+        if isinstance(other, self.__class__):
             return not self.Name == other.Name
         else:
             return NotImplemented
