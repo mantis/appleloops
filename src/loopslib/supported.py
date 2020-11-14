@@ -12,6 +12,7 @@ SUPPORTED = {
     'garageband1016': 'garageband1016.plist',
     'garageband1020': 'garageband1020.plist',
     'garageband1021': 'garageband1021.plist',
+    'garageband1040': 'garageband1040.plist',
     'logicpro1021': 'logicpro1021.plist',
     'logicpro1022': 'logicpro1022.plist',
     'logicpro1023': 'logicpro1023.plist',
@@ -24,6 +25,7 @@ SUPPORTED = {
     'mainstage324': 'mainstage324.plist',
     'mainstage330': 'mainstage330.plist',
     'mainstage340': 'mainstage340.plist',
+    'mainstage350': 'mainstage350.plist',
 }
 
 LOG.debug('Supported: {}'.format(SUPPORTED))

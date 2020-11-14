@@ -99,6 +99,11 @@ def get_status(headers):
 def get(url, output):
     """Retrieves the specified URL. Saves it to path specified in 'output' if present."""
     cmd = CURL_PATH + ['-L', '-C', '-', url, '--progress-bar', '--create-dirs', '-o', output]
+    headers = get_headers(url)
+    gzipped = headers.get('Content-Encoding', False) == 'gzip'
+
+    if gzipped:
+        cmd.extend(['--compressed'])
 
     try:
         subprocess.check_call(cmd)

@@ -4,6 +4,7 @@ import os
 import subprocess
 import sys
 
+
 # pylint: disable=relative-import
 try:
     import config
@@ -133,6 +134,9 @@ class CURL(object):
     def get(self, url, output=None, counter_msg=None, resume=True):
         """Retrieves the specified URL. Saves it to path specified in 'output' if present."""
         # NOTE: Must ignore 'dry run' state for any '.plist' file downloads.
+        _headers = self._get_headers(obj=url)
+
+        # Check if we're fetching a property list file
         _fetching_plist = url.endswith('.plist')
 
         # Now the command.
@@ -145,6 +149,13 @@ class CURL(object):
             cmd.extend(['-L', '-C', '-'])
 
         cmd.extend([url])
+
+        # If there is a content header indicating gzipped content, pass the compressed flag so
+        # curl can auto deflate it.
+        _gzipped = _headers.get('Content-Encoding', False) == 'gzip'
+
+        if _gzipped:
+            cmd.extend(['--compressed'])
 
         if config.FORCE_DOWNLOAD and os.path.exists(output):
             if not config.DRY_RUN:
@@ -189,9 +200,9 @@ class CURL(object):
                     _content_len = None
 
                     try:
-                        _content_len = self._get_headers(obj=url)['Content-Length']
+                        _content_len = _headers['Content-Length']
                     except KeyError:
-                        _content_len = self._get_headers(obj=url)['content-length']
+                        _content_len = _headers['content-length']
 
                     if _content_len and _local_len == _content_len:
                         _msg = _msg.replace('Re-downloading', 'Downloading')
