@@ -333,8 +333,8 @@ class LoopsArguments(object):
         config.OPTIONAL = result.optional
         config.QUIET = result.quiet
         config.SILENT = result.silent
-        config.INST_SLEEP = str(result.sleep[0])
-        config.CURL_RETRIES = str(result.retries[0])
+        config.INST_SLEEP = str(result.sleep) if result.sleep else None
+        config.CURL_RETRIES = result.retries
         config.TARGET = result.install_target[0] if result.install_target else config.TARGET
 
         # Handle result.download/result.force_download
