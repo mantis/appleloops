@@ -16,7 +16,7 @@ fi
 if [[ ! -z ${1} ]]; then
     DIST_CMD=$(echo /usr/local/bin/python3 -m zipapp src --compress --output ${BUILD_OUT} ${1})
 else
-    DIST_CMD=$(echo /usr/local/bin/python3 -m zipapp src --compress --output ${BUILD_OUT} --python=\"/usr/bin/env python\")
+    DIST_CMD=$(echo /usr/local/bin/python3 -m zipapp src --compress --output ${BUILD_OUT} --python=\"/usr/local/bin/python3\")
 fi
 
 # Clean up

@@ -3,20 +3,26 @@ import logging
 import os
 import subprocess  # NOQA
 
+from distutils.version import StrictVersion
+from time import sleep
+
 # pylint: disable=relative-import
 try:
     import config
     import curl_requests
     import misc
     import package
+    import version
 except ImportError:
     from . import config
     from . import curl_requests
     from . import misc
     from . import package
+    from . import version
 # pylint: enable=relative-import
 
 LOG = logging.getLogger(__name__)
+OS_VER = version.os_vers()
 
 
 class LoopDeployment(object):
@@ -168,10 +174,25 @@ class LoopDeployment(object):
     def process(self, pkg, counter_msg):
         """Processes the download/install of packages."""
         if not config.HTTP_DMG:
-            self._download(pkg=pkg, counter_msg=counter_msg)
+            try:
+                self._download(pkg=pkg, counter_msg=counter_msg)
+            except Exception as e:
+                LOG.info('Exception downloading: {}'.format(e.strip()))
+                pass
 
         if config.DEPLOY_PKGS or config.FORCED_DEPLOYMENT:
-            self._install(pkg=pkg, counter_msg=counter_msg)
+            try:
+                self._install(pkg=pkg, counter_msg=counter_msg)
+            except Exception as e:
+                LOG.info('Exception installing: {}'.format(e.strip()))
+                pass
+
+            # Installer can hang on the 'Preparing for install'
+            # in macOS 11.0.1, so delay the install for a few seconds
+            # to allow things to settle.
+            # if StrictVersion(OS_VER) > StrictVersion('10.15.99') or config.INST_SLEEP:
+            if not config.DRY_RUN and config.INST_SLEEP:
+                sleep(int(config.INST_SLEEP))
 
             if not config.DRY_RUN:
                 # Don't try and delete from DMG.

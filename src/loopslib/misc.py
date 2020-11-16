@@ -2,9 +2,9 @@
 import logging
 import os
 import shutil
-import subprocess
 import sys
 
+from distutils.version import StrictVersion
 from time import sleep
 
 # pylint: disable=relative-import
@@ -133,26 +133,12 @@ def tidy_up():
                 pass
 
 
-def os_build():
-    """Fetch OS build number."""
-    result = None
-    cmd = ['/usr/bin/sw_vers', '-buildVersion']
-
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    p_result, p_error = process.communicate()
-
-    if process.returncode == 0:
-        result = p_result.strip().decode('utf-8')
-
-    return result
-
-
 def debug_log_stats():
     """Drops a few configuration variables into the LOG."""
     # This is the very first point anything is logged.
     LOG.debug('Arguments: {}'.format(sys.argv))
 
-    LOG.debug('Python {} on macOS {} ({})'.format(version.PYTHON_VER, config.OS_VER, os_build()))
+    LOG.debug('Python {} on macOS {} ({})'.format(version.PYTHON_VER, config.OS_VER, config.OS_BUILD))
     LOG.debug('{}'.format(version.VERSION_STR))
 
     if config.APPS_TO_PROCESS:

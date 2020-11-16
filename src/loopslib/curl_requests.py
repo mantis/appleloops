@@ -46,6 +46,8 @@ class CURL(object):
                              '308 Permanent Redirect']
 
         cmd = [self._curl_path,
+               '--retry', config.CURL_RETRIES,  # Retry failed downloads n times (default 5), will wait 1sec then on each retry double the wait time.
+               '--retry-max-time', '10',  # Max of 10 seconds between each retry
                config.CURL_HTTP_ARG,
                '--user-agent',
                config.USERAGENT,
@@ -141,6 +143,8 @@ class CURL(object):
 
         # Now the command.
         cmd = [self._curl_path,
+               '--retry', config.CURL_RETRIES,  # Retry failed downloads n times (default 5), will wait 1sec then on each retry double the wait time.
+               '--retry-max-time', '10',  # Max of 10 seconds between each retry
                config.CURL_HTTP_ARG,
                '--user-agent',
                config.USERAGENT]

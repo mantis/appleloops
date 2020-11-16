@@ -2,9 +2,8 @@
 These must not be modified or behaviour could break."""
 import logging
 
-from distutils.version import LooseVersion
+from distutils.version import StrictVersion
 from os import path
-from platform import mac_ver
 
 # pylint: disable=relative-import
 try:
@@ -54,8 +53,10 @@ CACHING_SERVER = None
 # Do not override.
 CONTENTS_PATH = 'Contents'
 
+# CURL args/opts
 CURL_HTTP1 = True
 CURL_HTTP_ARG = '--http1.1'
+CURL_RETRIES = '5'
 
 # Debug on/off
 DEBUG = False
@@ -142,14 +143,18 @@ RESOURCES_PATH = path.join(CONTENTS_PATH, 'Resources')
 # No output.
 SILENT = False
 
+# Sleep for five seconds between installs.
+INST_SLEEP = None
+
 # All supported plists
 SUPPORTED_PLISTS = supported.SUPPORTED.copy()
 
 # Capture OS Version
-OS_VER = LooseVersion(mac_ver()[0])
+OS_VER = StrictVersion(version.os_vers())
+OS_BUILD = version.os_vers(arg='buildVersion')
 
 # Post Catalina, the disk containers and volumes change a bit
-CATALINA = OS_VER > LooseVersion('10.14.9')
+CATALINA = OS_VER > StrictVersion('10.14.9')
 
 # Target (this is for the 'installer' command.)
 # Using a different target for Catalina doesn't appear necessary.
