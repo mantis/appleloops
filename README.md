@@ -1,6 +1,9 @@
 # appleloops
 A utility to manage the deployment of the additional audio content Apple provides for GarageBand, Logic Pro X, and MainStage 3.
 
+# 2020-11-20 - Python 2 Deprecation:
+- The next release of appleloops will be properly Python 3 only and will hard exit if the version is not at least `3.7.9`.
+
 ## What's New in v3.1.4+
 - The `build.sh` script can be run with custom python paths provided.<br />
 For example: `./build.sh --python="/usr/local/bin/python3.7"`
